@@ -1,0 +1,27 @@
+This is a repository for a package that is a component of the GNV project
+for VMS.
+
+Its purpose is to provide a record of the source used for the GNV packaged
+version of the product.
+
+The original unmodified source is located in the reference/ directory and
+all VMS specific changes that have not been checked into the parent
+repository are located in the vms_source directory.
+
+A VMS concealed logical name of src_root: is for the reference directory and
+a VMS concealed logical name of vms_root: is set ot the vms_source directory.
+
+These are kept separate to make it easy to determine what VMS specific changes
+where made and to allow retargeting the src_root: to a different version to
+easily support maintaining multiple versions such as release, beta, and trunk
+at the same time.
+
+The user can then create a logical name of lcl_root: for the directory that
+will contain the build products.  The lcl_root: directory tree is the only
+directory tree that the build procedure should be modifying.
+
+A logcal name search list of prj_root: is set to lcl_root:,vms_root:,src_root:
+for building the package.
+
+Mercurial was chosen for the repository as there are clients that can run on
+VMS that is native to it.
