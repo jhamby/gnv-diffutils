@@ -1,0 +1,276 @@
+
+
+From File: diffutils_build_steps.txt
+
+ Copyright 2016, John Malmberg
+
+ Permission to use, copy, modify, and/or distribute this software for any
+ purpose with or without fee is hereby granted, provided that the above
+ copyright notice and this permission notice appear in all copies.
+
+ THE SOFTWARE IS PROVIDED "AS IS" AND THE AUTHOR DISCLAIMS ALL WARRANTIES
+ WITH REGARD TO THIS SOFTWARE INCLUDING ALL IMPLIED WARRANTIES OF
+ MERCHANTABILITY AND FITNESS. IN NO EVENT SHALL THE AUTHOR BE LIABLE FOR
+ ANY SPECIAL, DIRECT, INDIRECT, OR CONSEQUENTIAL DAMAGES OR ANY DAMAGES
+ WHATSOEVER RESULTING FROM LOSS OF USE, DATA OR PROFITS, WHETHER IN AN
+ ACTION OF CONTRACT, NEGLIGENCE OR OTHER TORTIOUS ACTION, ARISING OUT
+ OF OR IN CONNECTION WITH THE USE OR PERFORMANCE OF THIS SOFTWARE.
+
+Building diffutils on OpenVMS for use with GNV was done with the
+following minimum software versions
+
+ * HP C 7.x
+ * GNV AR_TOOLS 3.0.2
+ * GNV Bash 4.3.42
+ * GNV Coreutils 8.24
+ * GNV Grep 4.1.3
+ * GNV LD_TOOLS 3.0.4
+ * GNV MAKE 3.78.1
+ * GNV SED V4.2.2
+ ZIP 3.0 available by foreign command.
+
+The HP C 7.x compilers were used for building on Alpha and Itanium.
+At this time a VAX build has not been attempted.
+
+Several special things were done in this port of Diffutils to VMS to make it
+easier to keep it up to date with the Unix version.
+
+Note the GNV$ prefix is registered for the GNV project to prevent name
+collisions with other products and packages.  This is a VMS convention.
+
+The files are stored with GNV_ instead of GNV$ most open source source
+code maintainers do not want to files with $ in their source repositories.
+
+The build procedure will copy the files to have the GNV$ names as needed.
+
+
+1. The original GNU diffutils source files are in their own directory
+   tree which is never written to by the build process.  This directory
+   is kept up to date with the current official patches / releases.
+   See below about the how this is done with logical names.
+
+2. Modifications to the original GNU diffutils sources were avoided as
+   much as possible.  The prefered methods are to insert hacks in to a
+   header file gnv$first_include.h which the CC wrapper will add to all
+   the modules being built.
+
+3. If a source file has to be modified for the VMS port, instead of
+   editing the file directly, a TPU editor script as defined below.
+   While the script may occasionally need tweaking to accomodate a
+   new official difftils update, usually it will not.  More on that below.
+
+5. An optional file vms_eco_level.h is used to set the ECO of the package.
+   The vms_eco_level.h needs to be set back to zero if the version or
+   patch level of the GNU Unix source is changed.
+
+6. Any VAX build is an experimental build that is not currently very
+   useful and is not being tested.
+
+The use of the /first_include header files for selected modules is to
+provide replacement routines for ones either missing from the CRTL or
+ones that did not work the way that Coreutils required.
+
+The files used for a /first_include are named gnv_*.c_first in the
+GNV CVS repository.  The build procedure will rename them to
+gnv$*.c_first before using them.  This is for compatibility with
+GNV based builds, where the CC compiler will automatically use a
+gnv$*.c_first file if it is present.
+
+A feature of the HP CC compiler where it will ignore a non-existent
+directory in an #include directive is used to make sure that the VMS
+system header files are used instead of once provided with the ported
+product.  Macros and static routines are used.
+
+
+A TPU script UNIX_C_TO_VMS_C.TPU provides a number of editor subroutines
+that are useful in patching files, if patching files are required.
+
+A module specific TPU file can contain its own TPU commands, or it can call
+the editing routines.  In most cases the Editing routines can be used to
+insert a patch.
+
+
+The source kits are provided in backup savesets inside of the PCSI
+install kit.
+
+Backup save sets are currently the only distribution medium that I
+can be sure is installed on a target VMS system that will correctly
+unpack files with extended character sets in them.  You may need
+to adjust the ownership of the restored files for kits on
+Alpha/Itanium VMS versions 8.1 and earlier.
+
+On VAX, the filenames will be as seen on the VAX system, typically with non
+ODS-2 characters and case changes prefixed with $ characters.
+
+[gnv.common_src]diffutils-*_original_src.bck is the original source of the
+coreutils kit as provided by the GNV project.
+
+[gnv.vms_src]diffutils-*_vms_src.bck, if present, has the changed files that
+are used for building that are not yet in the coreutils source kits
+distributed by the GNU coreutils project.
+
+These backup savesets should be restored to different directory trees on
+an ODS-5 volume(s) which are referenced by concealed rooted logical names,
+unless on VAX, where either an NFS or ODS-2 volume can be used.
+
+SRC_ROOT: is for the source files common to all platforms.  This can be a
+          read only copy of the files from a change control repository.
+
+          In my build environment, the SOURCE_ROOT:[gnu.diffutils] is the
+          same directory as src_root:[diffutils].
+
+VMS_ROOT: is for the files that were changed from the repository copy of
+          SRC_ROOT:
+
+          Note, you should create the VMS_ROOT: directory tree even if it is
+          initially empty.  This is where you should put edits if you are
+          making changes.
+
+          In my build environment, the source_root:[gnu_vms.diffutils] is a
+          directory with the CVS checked out code and vms_root:[diffutils] is
+          a copy with any local modifications.
+
+          The command procedure compare_diffutils_source.com will report any
+          differences in the source_root:[gnu_vms.diffutils] directory and the
+          vms_root:[diffutils] directory.  If the source_root: logical is not
+          defined, it will translate the logical name src_root to do the
+          effective of src_root:[diffutils.-.-.gnu_vms.diffutils] to find the
+          VMS specific code CVS checkout based on where the checkout for
+          the GNU source is expected to be.
+
+LCL_ROOT: is manually created to have the same base and sub-directories as
+          SRC_ROOT: and VMS_ROOT:  This is for the architecture specific
+          binaries and other files created during the build.
+
+The logical name REF_ROOT: is defined to be a logical name that is a search
+list for VMS_ROOT:,SRC_ROOT:
+
+The logical name PRJ_ROOT: is defined to be a logical name that is a search
+list for LCL_ROOT:,REF_ROOT:
+
+The VMS_ROOT and LCL_ROOT directory trees can be created with commands
+similar to:
+
+  $ create/dir lcl_root:[diffutils]/prot=w:re
+  $ copy src_root:[diffutils...]*.dir -
+    lcl_root:[diffutils...]/prot=(o:rwed,w:re)
+  $ create/dir vms_root:[diffutils]/prot=w:re
+  $ copy src_root:[diffutils...]*.dir -
+    vms_root:[diffutils...]/prot=(o:rwed,w:re)
+
+One of the ways with to protect the source from being modified is to have
+the directories under src_root: owned by a user or resource where the build
+username only has read access to it.
+
+With these search lists set up and the properly, diffutils can be built by
+setting your default to PRJ_ROOT:[diffutils] and then issuing the command:
+
+   $ @[.vms]build_vms.com
+
+This command procedure will do the steps below and will build a PCSI kit if
+the GNV_PCSI_PRODUCER and GNV_PCSI_PRODUCER_FULL_NAME, and STAGE_ROOT are
+defined.
+
+First it will setup the build files by running a vms_prebuild.com
+procedure.  This sets copies copies/generate files, sets up logical
+names and symbols.
+
+      $ @[.vms]vms_prebuild.com
+
+It then runs a configure using a script from vms_prebuild.com.
+
+      $ bash ./vms_configure.sh
+
+It then cleans up the files generated by the configure script.
+
+For the last step it runs the make script.
+
+      $ bash vms/vms_make.sh
+
+The files are installed into a NEW_GNU directory for staging by running the
+procedure stage_coreutils_install.com.  This copies the binaries and creates
+alias links to them.
+
+   $ @[.vms]stage_coreutils_install.com
+
+On the VAX platform, the staged files are needed for building the PCSI
+kit, as the VAX source was staged on an NFS volume, which encodes the
+filenames that have any upper case or special symbols in them.
+
+To remove the staged files, the procedure is run again with the parameter
+"REMOVE".  This makes sure that the alias links are removed.
+
+The file make_check.com can be used to run the self tests as an option
+After running the tests, it creates a test_output.xml file that can be
+used by CI tools like Jenkins to report the test results.
+
+   $ @[.vms]make_check
+
+Building a PCSI kit for an architecture takes the following steps after
+making sure that you have a working build environment.
+
+Note that it requires manually creating two logical names as described
+below.  It is intentional that they be manually set.  This is for
+branding the PCSI kit based on who is making the kit.
+
+
+   1. Make sure that you have a staging directory that can be referenced
+      by the path STAGE_ROOT:[KIT]
+
+   2. Edit the file coreutils_release_note_start.txt or other text files to
+      reflect any changes.
+
+   3. Define the logical name GNV_PCSI_PRODUCER to indicate who is making
+      the distribution.  For making updates to an existing open source
+      kit you may need to keep the producer the same.
+
+   4. Define the logical name GNV_PCSI_PRODUCER_FULL_NAME to be your full
+      name or full name of your company.
+
+   6. Edit the file PCSI_DIFFUTILS_FILE_LIST.TXT if there are new files added
+      to the kit.  These files should all be ODS-2 legal filenames and
+      directories.
+
+      A limitation of the PCSI kitting procedure is that when selecting files,
+      it tends to ignore the directory structure and assumes that all files
+      with the same name are the same file, so every file placed in the kit
+      must have a unique name.  Then a procedure needs to be added to the kit
+      to create an alias link on install and remove the link on remove.
+
+      Since at this time diffutils does not need this alias procedure, the steps
+      to automatically build it are not included here.
+
+      While newer versions of PCSI can support ODS-5 filenames, not all verions
+      of PCSI on systems that have ODS-5 filenames do.  So as a post install
+      step, the PCSI kit built by these steps does a rename to the correct
+      case.
+
+   7. Prepare to backup the files for building the kit.
+
+      Note that if src_root: or vms_root: are NFS mounted disks, the
+      step of backing up the source files will probably hang or fail.
+
+      You need to copy the source files to VMS mounted disks and create
+      logical names SRC_ROOT1 and VMS_ROOT1 to work around this to to
+      reference local disks.  Make sure src_root1:[000000] and
+      vms_root1:[000000] exist and can be written to.
+
+   8. Build the PCSI kit with @[.vms]pcsi_product_diffutils.com
+
+      On VAX, the product command always prompts to the terminal for a
+      confirmation.
+
+      If there is another kit for this same version of diffutils, but for
+      a different base platform or operating system version, the product
+      command will prompt to the terminal to select which one to compress.
+
+       The following message is normal:
+          %PCSI-I-CANNOTVAL, cannot validate
+            EAGLE$DQA0:[stage_root.][kit]GNV-AXPVMS-DIFFUTILS-V--1.PCSI;1
+          -PCSI-I-NOTSIGNED, product kit is not signed and therefore has
+          no manifest file
+
+       This will result in both compressed and uncompressed kits for the target
+       platform.
+
+Good Luck.

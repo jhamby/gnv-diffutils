@@ -1,0 +1,79 @@
+! File: PCSI_DIFFUTILS_FILE_LIST.TXT
+!
+! File list for building a PCSI kit.
+! Very simple format so that the parsing logic can be simple.
+! links first, directory second, and files third.
+!
+! link -> file tells procedure to create/remove a link on install/uninstall
+! If more than one link, consider using an alias file.
+!
+! [xxx.yyy]foo.dir is a directory file for the rename phase.
+! [xxx.yyy.foo] is a directory file for the create phase.
+! Each subdirectory needs to be on its own pair of lines.
+!
+! [xxx.yyy]file.ext is a file for the rename and add phases.
+!
+! Copyright 2016, John Malmberg
+!
+! Permission to use, copy, modify, and/or distribute this software for any
+! purpose with or without fee is hereby granted, provided that the above
+! copyright notice and this permission notice appear in all copies.
+!
+! THE SOFTWARE IS PROVIDED "AS IS" AND THE AUTHOR DISCLAIMS ALL WARRANTIES
+! WITH REGARD TO THIS SOFTWARE INCLUDING ALL IMPLIED WARRANTIES OF
+! MERCHANTABILITY AND FITNESS. IN NO EVENT SHALL THE AUTHOR BE LIABLE FOR
+! ANY SPECIAL, DIRECT, INDIRECT, OR CONSEQUENTIAL DAMAGES OR ANY DAMAGES
+! WHATSOEVER RESULTING FROM LOSS OF USE, DATA OR PROFITS, WHETHER IN AN
+! ACTION OF CONTRACT, NEGLIGENCE OR OTHER TORTIOUS ACTION, ARISING OUT
+! OF OR IN CONNECTION WITH THE USE OR PERFORMANCE OF THIS SOFTWARE.
+!
+! 03-Jul-2016  J. Malmberg
+!
+!============================================================================
+[gnv]
+[000000]gnv.dir
+[gnv.bin]
+[gnv]bin.dir
+[gnv.vms_bin]
+[gnv]vms_bin.dir
+[gnv.lib]
+[gnv]lib.dir
+[gnv.usr]
+[gnv]usr.dir
+[gnv.usr.bin]
+[gnv.usr]bin.dir
+![gnv.usr.sbin]
+![gnv.usr]sbin.dir
+[gnv.usr.share]
+[gnv.usr]share.dir
+[gnv.usr.share.doc]
+[gnv.usr.share]doc.dir
+[gnv.usr.share.doc.diffutils]
+[gnv.usr.share.doc]diffutils.dir
+[gnv.usr.share.info]
+[gnv.usr.share]info.dir
+[gnv.usr.share.man]
+[gnv.usr.share]man.dir
+[gnv.usr.share.man.man1]
+[gnv.usr.share.man]man1.dir
+![gnv.usr.share.man.man7]
+![gnv.usr.share.man]man7.dir
+[gnv.usr.bin]gnv$cmp.exe
+[gnv.usr.bin]gnv$diff.exe
+[gnv.usr.bin]gnv$diff3.exe
+[gnv.usr.bin]gnv$sdiff.exe
+[gnv.vms_bin]remove_old_diffutils.com
+[gnv.vms_bin]diffutils_alias_setup.com
+![gnv.usr.share.doc.diffutils]ABOUT-NLS.
+![gnv.usr.share.doc.diffutils]COPYING.
+[gnv.usr.share.doc.diffutils]ChangeLog.
+![gnv.usr.share.doc.diffutils]NEWS.
+![gnv.usr.share.doc.diffutils]THANKS.
+[gnv.usr.share.doc.diffutils]README.
+![gnv.usr.share.doc.diffutils]TODO.
+[gnv.usr.share.info]diffutils.info
+[gnv.usr.share.man.man1]cmp.1
+[gnv.usr.share.man.man1]diff.1
+[gnv.usr.share.man.man1]diff3.1
+[gnv.usr.share.man.man1]sdiff.1
+![gnv.usr.share.man.man7]

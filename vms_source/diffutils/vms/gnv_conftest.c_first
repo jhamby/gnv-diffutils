@@ -1,0 +1,12 @@
+#define __UNIX_PUTC=1
+void __posix_exit(int __status);
+#define exit(__p1) __posix_exit(__p1)
+
+/* Needed for stropts test */
+/* #define u_short unsigned short */
+/* #define u_char unsigned char */
+/* #define u_long unsigned long */
+
+/* #define __SA_FAMILY_T */
+/* typedef unsigned char my_sa_family_t; */
+/* typedef my_sa_family_t sa_family_t; */

@@ -1,0 +1,245 @@
+From file: diffutils_release_note_start.com
+
+This is a port of Diffutils 3.3 with input from the many VMS OpenSource
+developers.  Much of this is from lessons learned from the Bash 4.2.45 port.
+
+Note: I am a hobbyist and am not providing any support or any commitment
+to supply bug fixes or future releases.  This code is as-is with no
+warrantees.
+
+The testing of this port of Diffutils involved some spot testing of the
+various utilities, particularly the rm and mv utilities which had visible
+bugs in GNV.  At this time, A VAX build has not been attempted and would
+need some work.
+
+Special installation notes:
+
+*  Please see https://sourceforge.net/p/gnv/wiki/InstallingGNVPackages/
+   for the latest information on installing GNV related PCSI kits.
+
+*  We are updating and replacing GNV one kit at a time and transitioning
+   GNV to be a set of kits that the GNV package will install.  During
+   this transition some extra issues will need to be handled during
+   installs and upgrades.
+
+*  Due to the way that PCSI identifies packages, if you install a package
+   from one producer and then want to upgrade it from another producer,
+   you will probably need to uninstall the previous package first.
+
+   Some of these packages were previously created with different producer
+   prefixes.  We are standardizing on VMSPORTS and GNV as the branding
+   prefixes.  GNV will be for packages that are part of the GNV product
+   suite, and VMSPORTS will be for most other packages.
+
+   This uninstall can cause warning messages about dependencies.  If you
+   are transitioning to an upwardly compatible package, you can ignore
+   those warnings.
+
+*  This package should be installed to the same volume as GNV is installed.
+
+   If you uninstall or upgrade GNV or install a GNV from before the
+   transition is complete, you will need to reinstall all other packages
+   that install to the same GNV directory tree.
+
+   This is because at least some of the existing GNV installation procedures
+   have bugs in them were instead of just deleting the files that were
+   installed, they delete all files in the GNV directory tree.
+
+*  Because this is a transition, this package is replacing files from the
+   old GNV packages.  This is a necessary issue to allow incremental
+   improvement as we can not replace the GNV package until we get all
+   the component packages done.
+
+*  The GNV 2.x through at least the 3.0.1 kits make an unusual change
+   to the disk directory structure where they are installed where
+   they use the [vms$common.gnv] as a mount point and mount the posix
+   root on it.  This is a bug because it causes many problems and does
+   not offer any advantages.  One of the problems is that it causes
+   problems with other PCSI installs and uninstalls to that directory.
+
+   This bug can be manually repaired such as has been done on
+   on encompasserve.org as documented in PORTING_TO_VMS notes conference.
+
+   At this time, we do not have a scripted repair to this bug, and it
+   may not be possible to fully script a repair because this bug can
+   cause the POSIX root and [vms$common.gnv] to have different contents
+   when they should be the same directory, and it will take a manual
+   inspection to select which files go where.
+
+*  Because of the directory change bug, the gnv$startup.com in the GNV
+   kit must be run when the system boots up or the [vms$common.gnv]
+   directory will appear to be empty.
+
+   If a PCSI kit like this one is installed when the GNV startup has not
+   been run, it will create a new directory tree under [vms$common.gnv]
+   that will not be visible to the posix root.  If you uninstall this
+   PCSI kit before running the gnv$startup.com procedure then you can
+   install it after running the gnv$startup.com procedure.  If you have
+   run the gnv$startup.com procedure after the install, then you have
+   a mess, and you will need to use the GNV umnt to un-mount the
+   [vms$common.gnv] directory before the uninstall of this kit will
+   work.
+
+An analyze/disk/repair step on the installation disk should be done after
+installation to collect files left over from incomplete deletions into the
+SYSLOST directory.  This step should be done on a "quiet" system per HP
+recomendations.
+
+Bugs can be logged at the tracker with https://sourceforge.net/projects/gnv/.
+There is no guarantee that bugs will be fixed for a hobbyist build.
+
+VMS specific port information:
+
+The logical name GNV$GNU is used to find the simulated posix root and defines
+the logical name SYS$POSIX_ROOT in the process table in user mode for child
+processes if needed.  This is to comply with VMS logical name conventions.
+The logical name BIN is also set in the process table in user mode to be
+GNV$GNU:[BIN] if it is not already set.
+
+The following DECC$Feature settings are in in effect for Diffutils by default:
+
+DECC$ACL_ACCESS_CHECK enabled.
+DECC$ALLOW_REMOVE_OPEN_FILES enabled.
+DECC$ARGV_PARSE_STYLE enabled.
+DECC$EFS_CASE_PRESERVE enabled.
+DECC$EFS_CHARSET enabled.
+DECC$EFS_FILE_TIMESTAMPS enabled.
+DECC$ENABLE_GETENV_CACHE enabled.
+DECC$EXEC_FILEATTR_INHERITANCE set to 2.
+DECC$FILE_PERMISSION_UNIX enabled.
+DECC$FILE_SHARING enabled.
+DECC$FILE_OWNER_UNIX enabled.
+DECC$FILENAME_UNIX_NO_VERSION enabled.
+DECC$FILENAME_UNIX_ONLY enabled.
+DECC$GLOB_UNIX_STYLE enabled.
+DECC$POSIX_SEEK_STREAM_FILE enabled.
+DECC$READDIR_DROPDOTNOTYPE enabled.
+DECC$RENAME_NO_INHERIT enabled.
+DECC$STDIO_CTX_EOL enabled.
+DECC$STRTOL_ERANGE enabled.
+DECC$UNIX_PATH_BEFORE_LOGNAME enabled.
+
+While more strict UNIX compatibility feature settings can be applied by users
+by setting feature logical names, these settings are all the Bash and most
+ported programs need.
+
+Diffutils currently uses the same control characters as VMS.
+Control-Z is EOF.  It will need to be a future enhancement to have the
+control characters set by programs so that they can be set to match
+UNIX where possible by the terminal driver.
+
+This port of Diffutils uses the VMS CRTL to handle the Unix format pathnames
+and as such is dependent on them.  It is a known issue that directories with
+a Unix name "file.dir/" and some symbolic links are not handled correctly.
+This is a combination of problems with RMS and CRTL.  The RMS portion is
+fixed with the VMS84?_RMS-V0300 ECO kit.  I am not aware of a CRTL kit that
+fixes the issues.
+
+Workarounds have been implemented for the cases that have been observed in
+for running configure scripts.  These are not complete work arounds, so there
+still may be corner cases that fail.
+
+This kit is designed to be used with the GNV Bash 4.2.45 or later kit.
+
+Fixes and enhancements in the Diffutils 3.3 kit.
+
+* Improved support for deep directories.  While the OpenVMS CRTL does not
+  currently fully suppport deep directories, this port attempts to work
+  around the issue.
+
+* This kit should be able to be installed on VMS Software Inc. releases of
+  OpenVMS.
+
+* No logical names required for proper Diffutils operations other than GNV$GNU
+  for locating the simulated "/".
+
+  The older GNV programs may still need the logical names until they get
+  the same fixes.  Those additional logical names should be set in
+  GNV$GNU:[lib]gnv_setup.com instead of in the system startup.
+
+* GNV$GNU is used to find the posix root and locally sets SYS$POSIX_ROOT
+  for child processes if needed.  This is to comply with VMS logical
+  name conventions.  The logical name BIN is also set locally to be
+  GNV$GNU:[BIN] if it is not already set.
+
+The supplied GNV$DIFFUTILS_STARTUP.COM procedure is provided in
+[VMS$COMMON.SYS$STARTUP] can be put in your VMS startup procedure to install
+selected images as known.  It is recommended that the GNV$STARTUP.COM
+procedure be run first, followed by the GNV$BASH_STARTUP.COM procedure
+before the GNV$DIFFUTILS_STARTUP.COM is executed.
+
+The names of the Diffutils images have been prefixed with GNV$ to prevent
+possible naming conflicts with other programs that are on the system.  The
+GNV$ prefix has been registered with HP for this purpose.
+
+OpenVMS specific building and kitting instructions are after the standard
+bash readme file below.
+
+Acknowledgements:
+
+This port was done by John Malmberg using information from the Bash 4.2.45
+port.
+
+
+There may be bugs in the GNV ports of diffutils for OpenVMS that were not
+officially recorded but have now been fixed as a result of resolving the
+above listed bug reports. So, you are encouraged to try out this release
+and report anomolies on the GNV Bug Reporting page:
+
+https://sourceforge.net/p/gnv/bugs/?source=navbar
+
+Currently, the focus of the OpenVMS GNV porting team is to address bugs in
+the OpenVMS port of GNV components that pose immediate barriers to running
+configure and make scripts for Open Source Software packages targeting
+OpenVMS environments.
+
+The GNV development team is involved in an ongoing effort to identify and
+document the underlying technical causes for these current limitations and (if
+available) workarounds as well as developing code fixes to eliminate them. The
+VMS-Ports Source Forge project at https://sourceforge.net/p/vms-ports/tickets/
+currently documents OpenVMS CRTL bugs and limitations with respect to porting
+Open Source Software using OpenVMS. The VMS-Ports Source Forge Project also
+contains examples of ported packages provided by volunteer contributors as well
+as documentation with recommendations on how to setup, modify and use the
+OpenVMS GNV environment for the purpose of porting Open Source software
+packages to OpenVMS. Browse to https://sourceforge.net/p/vms-ports/wiki/Home/
+for more information.
+
+
+1.) The OpenVMS CRTL does not fully support deep directories.  While this
+    version of diffutils attempts to work around it, the configure scripts
+    for coreutils, diffutils, gnu tar and others do tests to see how deep
+    directories can be created.  The "rm -rf" utility is unable to delete
+    all the deep directories in one pass.
+
+    The quickest workaround is to identify where in configure the test is
+    being done and preset an environment variable with the result of the test.
+
+    For example this skips the test for diffutils:
+
+    $ export gl_cv_func_getcwd_path_max=no
+
+2.) The CRTL does not set the Delete bit on files the same way as Posix.
+    On Posix a file is deletable if the user has write access to the
+    parent directory.
+
+    This shows up in some configure and make steps, where configure or make
+    sets a file to be readonly and then tries to delete it.  As above a
+    symbol can be exported to preset the answer.
+
+    For example this skips the test for diffutils:
+
+    $ export gl_cv_func_working_utimes=yes
+
+    Other workarounds for make are done by setting an ACL on the affected
+    build directory that always gives the user write access to the files
+    in it.  The directory version limit is also set to 1.
+
+3.) The configure test for msktemp now appears to be attempting to
+     create 70 4GB files as part of the test.  I do not have that much
+     space on my build directories at the present time.
+
+    I export this symbol to skip the test:
+
+    $ export gl_cv_func_working_mkstemp=yes
+
