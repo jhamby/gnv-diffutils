@@ -159,11 +159,36 @@ $	goto hack1_loop
 $hack1_loop_end:
 $   close cfg_hack1
 $!
-$   write cfg_out "./configure --prefix=/usr --disable-dependency-tracking"
+$   write cfg_out -
+  "./configure --prefix=/usr --config-cache  --disable-dependency-tracking"
 $   close cfg_out
 $!
 $   purge/log 'vms_cfg_script'
 $endif
+$!
+$ arch_type = f$getsyi("ARCH_NAME")
+$ node_swvers = f$getsyi("node_swvers")
+$ vernum = f$extract(1, f$length(node_swvers), node_swvers)
+$ majver = f$element(0, ".", vernum)
+$ minverdash = f$element(1, ".", vernum)
+$ minver = f$element(0, "-", minverdash)
+$ dashver = f$element(1, "-", minverdash)
+$ if dashver .eqs. "-" then dashver = ""
+$ vmstag = arch_type + "_" + majver + "_" + minver
+$ if dashver .nes. "" then vmstag = vmstag + "_" + dashver
+$ vmstag = f$edit(vmstag, "lowercase")
+$!
+$!
+$! Autoconf says not to provide a cached config file for a platform.
+$! We do this here because configure takes too long to run and
+$! will produce the same results for a VMS version.
+$ vms_cache = "sys$disk:[.vms]config.cache_''vmstag'"
+$ write sys$output "lookng for ''vms_cache' file."
+$ if f$search(vms_cache) .nes. ""
+$ then
+$   copy 'vms_cache' sys$disk:[]config.cache
+$ endif
+$!
 $!
 $! The CRTL can not handle if the default is set to a directory that
 $! does not exist in the first member of a search list.
