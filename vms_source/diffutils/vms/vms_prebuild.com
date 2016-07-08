@@ -14,6 +14,10 @@ $ cname = "/names=(as_is,short)/main=posix_exit"
 $ cfloat = "/float=IEEE/IEEE_MODE=DENORM_RESULTS"
 $ cinc = "/nested=NONE"
 $ cc :== cc'cstand''caccept''clist''cname''cfloat''cinc''prefix'/debug
+$ defdir = f$environment("default")
+$ defdir_base = defdir - "]" - ">"
+$ delim = f$extract(f$length(defdir) -1, 1, defdir)
+$ define decc$user_include 'defdir_base'.vms'delim'
 $!
 $ if p1 .eqs. "DEBUG"
 $ then

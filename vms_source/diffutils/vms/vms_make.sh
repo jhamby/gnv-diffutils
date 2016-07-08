@@ -34,6 +34,14 @@ sleep 2
 touch man/cmp.1 man/diff.1 man/diff3.1 man/sdiff.1
 touch doc/diffutils.info
 
+# Replacement VMS routines
+cc -c -I lib -o lib/progname.o vms/vms_progname.c
+cc -c -o lib/gnv_vms_iconv_wrapper.o vms/gnv_vms_iconv_wrapper.c
+
+pushd lib
+ar r libdiffutils.a progname.o gnv_vms_iconv_wrapper.o
+popd
+
 export GNV_OPT_DIR=.
 make
 
