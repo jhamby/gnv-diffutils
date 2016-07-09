@@ -19,6 +19,7 @@ $!
 $ test_class = def_testclass
 $ fail_msg = "failed"
 $ fail_type = "check"
+$ skip_reason = "known issue"
 $!
 $ arch_name = f$edit(f$getsyi("arch_name"), "UPCASE")
 $!
@@ -40,6 +41,13 @@ $	then
 $	    test = f$element(1, ":", line_in)
 $	    test = f$edit(test, "trim")
 $	    gosub junit_report_fail
+$	else
+$	    if key .eqs. "SKIP "
+$	    then
+$		test = f$element(1, ":", line_in)
+$		test = f$edit(test, "trim")
+$		gosub junit_report_skip
+$	    endif
 $	endif
 $   endif
 $   goto test_loop

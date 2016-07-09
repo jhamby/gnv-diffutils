@@ -37,18 +37,44 @@ $	goto copy_loop
 $copy_loop_end:
 $   endif
 $   ! Temp hack to prevent hang
-$   create 'base_disk'[.tests]new-file.
-$   open/append test_fix 'base_disk'[.tests]new-file.
-$   write test_fix "exit 1"
-$   close test_fix
+$   copy [.vms]new-file. 'base_disk'[.tests]new-file.
 $   purge 'base_disk'[.tests]new-file.
 $!
-$   ! Temp hack because of known bug
-$   create 'base_disk'[.tests]no-dereference.
-$   open/append test_fix 'base_disk'[.tests]no-dereference.
+$   ! Temp hack because of known bug in CRTL tripped by coreutils
+$   test_name = "no-dereference"
+$   create 'base_disk'[.tests]'test_name'.
+$   open/append test_fix 'base_disk'[.tests]'test_name'.
+$   write test_fix "printf "":test-result: SKIP\n"" > ''test_name'.trs"
+$   write test_fix "printf "":global-test-result: SKIP\n"" >> ''test_name'.trs"
+$   write test_fix "printf "":recheck: yes\n"" >> ''test_name'.trs"
+$   write test_fix "printf "":copy-in-global-log: yes\n"" >> ''test_name'.trs"
 $   write test_fix "exit 1"
 $   close test_fix
-$   purge 'base_disk'[.tests]no-dereference.
+$   purge 'base_disk'[.tests]'test_name'.
+$!
+$!  help-version needs gzip to even hope to pass
+$!  env utility also appears not to be working.
+$!  help-version also needs a /dev/full to be implemented which is not
+$!  going to happen soon.
+$!  Script also looks like it is testing coreutils tools like mknod() which
+$!  do not port to VMS.
+$!----------------------------------------------
+$!   if f$search("gnv$gnu:[*...]gzip") .eqs. ""
+$!   then
+$	test_name = "help-version"
+$	create 'base_disk'[.tests]'test_name'.
+$	open/append test_fix 'base_disk'[.tests]'test_name'.
+$	write test_fix "printf "":test-result: SKIP\n"" > ''test_name'.trs"
+$	write test_fix -
+	  "printf "":global-test-result: SKIP\n"" >> ''test_name'.trs"
+$	write test_fix "printf "":recheck: yes\n"" >> ''test_name'.trs"
+$	write test_fix -
+	  "printf "":copy-in-global-log: yes\n"" >> ''test_name'.trs"
+$	write test_fix "exit 1"
+$	close test_fix
+$	purge 'base_disk'[.tests]'test_name'.
+$!   endif
+$!
 $!
 $!   set default 'base_disk'
 $ endif

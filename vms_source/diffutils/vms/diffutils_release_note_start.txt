@@ -141,32 +141,98 @@ still may be corner cases that fail.
 
 This kit is designed to be used with the GNV Bash 4.2.45 or later kit.
 
+Known issues with the Diffutils 3.3 kit.
+
+*   The filename-quoting test fails because it tries to create filenames
+    of "Control-A" and "Control-I", which the CRTL does not currently allow.
+
+*   The no-newline-at-eof test fails on VMS for a few subtests.  The exact
+    cause is not known.  It may be an issue that the CRTL is adding an
+    implied new-line for the partial record.
+
+*   The new-file test has been modified due to an issue found in GNV Bash.
+    Even so it still fails one sub-test.  It may be because of a difference
+    in how VMS handles standard input and redirecting it to /dev/null instead
+    of actually having standard input closed.
+    https://sourceforge.net/p/gnv/bugs/108/
+
+*   The help-version test will not be run because wants a /dev/full device
+    which VMS does not provide, and appears to try to use coreutils
+    components like mknod which could not be ported to VMS.
+
+*   The no-dereference test trips is currently skipped because when run on
+    default directory being a search list, it trips a bug in the CRTL that
+    aborts the test run.
+    https://sourceforge.net/p/gnv/bugs/110/
+
+*   Currently tests intended to be marked SKIP: or XFAIL: are being marked
+    as failures.  Hopefully this will be fixed in a future release.
+
+*   The OpenVMS CRTL does not fully support deep directories.  While this
+    version of diffutils attempts to work around it, the configure scripts
+    for coreutils, diffutils, gnu tar and others do tests to see how deep
+    directories can be created.  The "rm -rf" utility is unable to delete
+    all the deep directories in one pass.
+
+    The quickest workaround is to identify where in configure the test is
+    being done and preset an environment variable with the result of the test.
+
+    For example this skips the test for diffutils:
+
+    $ export gl_cv_func_getcwd_path_max=no
+
+*   The CRTL does not set the Delete bit on files the same way as Posix.
+    On Posix a file is deletable if the user has write access to the
+    parent directory.
+
+    This shows up in some configure and make steps, where configure or make
+    sets a file to be readonly and then tries to delete it.  As above a
+    symbol can be exported to preset the answer.
+
+    For example this skips the test for diffutils:
+
+    $ export gl_cv_func_working_utimes=yes
+
+    Other workarounds for make are done by setting an ACL on the affected
+    build directory that always gives the user write access to the files
+    in it.  The directory version limit is also set to 1.
+
+*   The configure test for msktemp now appears to be attempting to
+    create 70 4GB files as part of the test.  I do not have that much
+    space on my build directories at the present time.
+
+    I export this symbol to skip the test:
+
+    $ export gl_cv_func_working_mkstemp=yes
+
 Fixes and enhancements in the Diffutils 3.3 kit.
 
-* Improved support for deep directories.  While the OpenVMS CRTL does not
-  currently fully suppport deep directories, this port attempts to work
-  around the issue.
+*   This kit should be able to be installed on VMS Software Inc. releases of
+    OpenVMS.
 
-* This kit should be able to be installed on VMS Software Inc. releases of
-  OpenVMS.
+*   No logical names required for proper Diffutils operations other than GNV$GNU
+    for locating the simulated "/".
 
-* No logical names required for proper Diffutils operations other than GNV$GNU
-  for locating the simulated "/".
+    The older GNV programs may still need the logical names until they get
+    the same fixes.  Those additional logical names should be set in
+    GNV$GNU:[lib]gnv_setup.com instead of in the system startup.
 
-  The older GNV programs may still need the logical names until they get
-  the same fixes.  Those additional logical names should be set in
-  GNV$GNU:[lib]gnv_setup.com instead of in the system startup.
+*   GNV$GNU is used to find the posix root and locally sets SYS$POSIX_ROOT
+    for child processes if needed.  This is to comply with VMS logical
+    name conventions.  The logical name BIN is also set locally to be
+    GNV$GNU:[BIN] if it is not already set.
 
-* GNV$GNU is used to find the posix root and locally sets SYS$POSIX_ROOT
-  for child processes if needed.  This is to comply with VMS logical
-  name conventions.  The logical name BIN is also set locally to be
-  GNV$GNU:[BIN] if it is not already set.
 
 The supplied GNV$DIFFUTILS_STARTUP.COM procedure is provided in
-[VMS$COMMON.SYS$STARTUP] can be put in your VMS startup procedure to install
-selected images as known.  It is recommended that the GNV$STARTUP.COM
-procedure be run first, followed by the GNV$BASH_STARTUP.COM procedure
-before the GNV$DIFFUTILS_STARTUP.COM is executed.
+[VMS$COMMON.SYS$STARTUP] can be put in your VMS startup procedure to
+make sure that the GNV$GNU logical name is created.  As there are
+no shared images currently in the Diffutils kit, if another startup
+command file is defining GNV$GNU: then you do not need to add the
+GNV$DIFFUTILS_STARTUP.COM to your system startup.
+
+It is recommended that the GNV$STARTUP.COM procedure be run first,
+followed by the GNV$BASH_STARTUP.COM procedure before other startup command
+files that use GNV$GNU are run.
 
 The names of the Diffutils images have been prefixed with GNV$ to prevent
 possible naming conflicts with other programs that are on the system.  The
@@ -178,8 +244,7 @@ bash readme file below.
 Acknowledgements:
 
 This port was done by John Malmberg using information from the Bash 4.2.45
-port.
-
+and later GNV ports.
 
 There may be bugs in the GNV ports of diffutils for OpenVMS that were not
 officially recorded but have now been fixed as a result of resolving the
@@ -204,42 +269,4 @@ as documentation with recommendations on how to setup, modify and use the
 OpenVMS GNV environment for the purpose of porting Open Source software
 packages to OpenVMS. Browse to https://sourceforge.net/p/vms-ports/wiki/Home/
 for more information.
-
-
-1.) The OpenVMS CRTL does not fully support deep directories.  While this
-    version of diffutils attempts to work around it, the configure scripts
-    for coreutils, diffutils, gnu tar and others do tests to see how deep
-    directories can be created.  The "rm -rf" utility is unable to delete
-    all the deep directories in one pass.
-
-    The quickest workaround is to identify where in configure the test is
-    being done and preset an environment variable with the result of the test.
-
-    For example this skips the test for diffutils:
-
-    $ export gl_cv_func_getcwd_path_max=no
-
-2.) The CRTL does not set the Delete bit on files the same way as Posix.
-    On Posix a file is deletable if the user has write access to the
-    parent directory.
-
-    This shows up in some configure and make steps, where configure or make
-    sets a file to be readonly and then tries to delete it.  As above a
-    symbol can be exported to preset the answer.
-
-    For example this skips the test for diffutils:
-
-    $ export gl_cv_func_working_utimes=yes
-
-    Other workarounds for make are done by setting an ACL on the affected
-    build directory that always gives the user write access to the files
-    in it.  The directory version limit is also set to 1.
-
-3.) The configure test for msktemp now appears to be attempting to
-     create 70 4GB files as part of the test.  I do not have that much
-     space on my build directories at the present time.
-
-    I export this symbol to skip the test:
-
-    $ export gl_cv_func_working_mkstemp=yes
 
