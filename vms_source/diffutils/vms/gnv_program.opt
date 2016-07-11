@@ -1,1 +1,2 @@
+sys$disk:[-]gnv_vms_iconv_wrapper.o
 sys$disk:[-]vms_crtl_init_unix.obj

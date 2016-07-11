@@ -36,11 +36,7 @@ touch doc/diffutils.info
 
 # Replacement VMS routines
 cc -c -I lib -o lib/progname.o vms/vms_progname.c
-cc -c -o lib/gnv_vms_iconv_wrapper.o vms/gnv_vms_iconv_wrapper.c
-
-pushd lib
-ar r libdiffutils.a progname.o gnv_vms_iconv_wrapper.o
-popd
+cc -c -o gnv_vms_iconv_wrapper.o vms/gnv_vms_iconv_wrapper.c
 
 export GNV_OPT_DIR=.
 make
