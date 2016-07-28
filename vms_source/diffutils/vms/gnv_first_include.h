@@ -5,4 +5,7 @@
 #define SA_RESTART 0
 
 #include "vms_lstat_hack.h"
+#ifdef vfork
+#undef vfork
+#endif
 #include "gnv_vms_iconv.h"

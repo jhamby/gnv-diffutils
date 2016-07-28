@@ -40,17 +40,39 @@ $   ! Temp hack to prevent hang
 $   copy [.vms]new-file. 'base_disk'[.tests]new-file.
 $   purge 'base_disk'[.tests]new-file.
 $!
-$   ! Temp hack because of known bug in CRTL tripped by coreutils
-$   test_name = "no-dereference"
-$   create 'base_disk'[.tests]'test_name'.
-$   open/append test_fix 'base_disk'[.tests]'test_name'.
-$   write test_fix "printf "":test-result: SKIP\n"" > ''test_name'.trs"
-$   write test_fix "printf "":global-test-result: SKIP\n"" >> ''test_name'.trs"
-$   write test_fix "printf "":recheck: yes\n"" >> ''test_name'.trs"
-$   write test_fix "printf "":copy-in-global-log: yes\n"" >> ''test_name'.trs"
-$   write test_fix "exit 1"
-$   close test_fix
-$   purge 'base_disk'[.tests]'test_name'.
+$   ! skip hack because of known bug in CRTL tripped by coreutils 8.24 and
+$   ! earlier.
+$!
+$   chmod_tmp = "sys$disk:[]chmod_version.tmp"
+$   if f$search(chmod_tmp) .nes. "" then delete 'chmod_tmp';*
+$   define/user sys$output 'chmod_tmp'
+$   mcr gnv$gnu:[bin]chmod.exe --version
+$   open/read cmt 'chmod_tmp'
+$   read cmt line_in
+$   close cmt
+$   chmod_verstr = f$element(1, ")", line_in)
+$   chmod_verstr = f$edit(chmod_verstr, "trim")
+$   chmod_majver = 'f$element(0, ".", chmod_verstr)'
+$   chmod_minver = 'f$element(1, ".", chmod_verstr)'
+$!
+$   do_test = 0
+$   if (chmod_majver .gt. 8) then do_test = 1
+$   if (chmod_majver .eq. 8) .and. (chmod_minver .gt. 24) then do_test = 1
+$!
+$   if do_test .eq. 0
+$   then
+$	test_name = "no-dereference"
+$	create 'base_disk'[.tests]'test_name'.
+$	open/append test_fix 'base_disk'[.tests]'test_name'.
+$	write test_fix "printf "":test-result: SKIP\n"" > ''test_name'.trs"
+$	write test_fix -
+            "printf "":global-test-result: SKIP\n"" >> ''test_name'.trs"
+$	write test_fix "printf "":recheck: yes\n"" >> ''test_name'.trs"
+$	write test_fix "printf "":copy-in-global-log: yes\n"" >> ''test_name'.trs"
+$	write test_fix "exit 1"
+$	close test_fix
+$	purge 'base_disk'[.tests]'test_name'.
+$  endif
 $!
 $!  help-version needs gzip to even hope to pass
 $!  env utility also appears not to be working.

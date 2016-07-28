@@ -160,9 +160,11 @@ Known issues with the Diffutils 3.3 kit.
     which VMS does not provide, and appears to try to use coreutils
     components like mknod which could not be ported to VMS.
 
-*   The no-dereference test trips is currently skipped because when run on
-    default directory being a search list, it trips a bug in the CRTL that
-    aborts the test run.
+*   The no-dereference test trips is skipped if the installed coreutils
+    is less than 8.25.  The VMS CRTL lstat() function is having some
+    issues with symbolic links as noted above.
+    On OpenVMS/AXP 8.4 system unwind messages may be seen while running
+    this test.
     https://sourceforge.net/p/gnv/bugs/110/
 
 *   Currently tests intended to be marked SKIP: or XFAIL: are being marked
