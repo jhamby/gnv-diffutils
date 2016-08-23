@@ -59,11 +59,11 @@ The build procedure will copy the files to have the GNV$ names as needed.
    While the script may occasionally need tweaking to accomodate a
    new official difftils update, usually it will not.  More on that below.
 
-5. An optional file vms_eco_level.h is used to set the ECO of the package.
+4. An optional file vms_eco_level.h is used to set the ECO of the package.
    The vms_eco_level.h needs to be set back to zero if the version or
    patch level of the GNU Unix source is changed.
 
-6. Any VAX build is an experimental build that is not currently very
+5. Any VAX build is an experimental build that is not currently very
    useful and is not being tested.
 
 The use of the /first_include header files for selected modules is to
