@@ -68,7 +68,7 @@ The build procedure will copy the files to have the GNV$ names as needed.
 
 The use of the /first_include header files for selected modules is to
 provide replacement routines for ones either missing from the CRTL or
-ones that did not work the way that Coreutils required.
+ones that did not work the way that Diffutils required.
 
 The files used for a /first_include are named gnv_*.c_first in the
 GNV CVS repository.  The build procedure will rename them to
@@ -103,11 +103,11 @@ On VAX, the filenames will be as seen on the VAX system, typically with non
 ODS-2 characters and case changes prefixed with $ characters.
 
 [gnv.common_src]diffutils-*_original_src.bck is the original source of the
-coreutils kit as provided by the GNV project.
+diffutils kit as provided by the GNV project.
 
 [gnv.vms_src]diffutils-*_vms_src.bck, if present, has the changed files that
-are used for building that are not yet in the coreutils source kits
-distributed by the GNU coreutils project.
+are used for building that are not yet in the diffutils source kits
+distributed by the GNU diffutils project.
 
 These backup savesets should be restored to different directory trees on
 an ODS-5 volume(s) which are referenced by concealed rooted logical names,
@@ -129,14 +129,6 @@ VMS_ROOT: is for the files that were changed from the repository copy of
           In my build environment, the source_root:[gnu_vms.diffutils] is a
           directory with the CVS checked out code and vms_root:[diffutils] is
           a copy with any local modifications.
-
-          The command procedure compare_diffutils_source.com will report any
-          differences in the source_root:[gnu_vms.diffutils] directory and the
-          vms_root:[diffutils] directory.  If the source_root: logical is not
-          defined, it will translate the logical name src_root to do the
-          effective of src_root:[diffutils.-.-.gnu_vms.diffutils] to find the
-          VMS specific code CVS checkout based on where the checkout for
-          the GNU source is expected to be.
 
 LCL_ROOT: is manually created to have the same base and sub-directories as
           SRC_ROOT: and VMS_ROOT:  This is for the architecture specific
@@ -188,10 +180,10 @@ For the last step it runs the make script.
       $ bash vms/vms_make.sh
 
 The files are installed into a NEW_GNU directory for staging by running the
-procedure stage_coreutils_install.com.  This copies the binaries and creates
+procedure stage_diffutils_install.com.  This copies the binaries and creates
 alias links to them.
 
-   $ @[.vms]stage_coreutils_install.com
+   $ @[.vms]stage_diffutils_install.com
 
 On the VAX platform, the staged files are needed for building the PCSI
 kit, as the VAX source was staged on an NFS volume, which encodes the
@@ -217,7 +209,7 @@ branding the PCSI kit based on who is making the kit.
    1. Make sure that you have a staging directory that can be referenced
       by the path STAGE_ROOT:[KIT]
 
-   2. Edit the file coreutils_release_note_start.txt or other text files to
+   2. Edit the file diffutils_release_note_start.txt or other text files to
       reflect any changes.
 
    3. Define the logical name GNV_PCSI_PRODUCER to indicate who is making
