@@ -1,5 +1,5 @@
-/* Test of malloc function.
-   Copyright (C) 2010-2013 Free Software Foundation, Inc.
+/* Test listen() function.
+   Copyright (C) 2011-2016 Free Software Foundation, Inc.
 
    This program is free software: you can redistribute it and/or modify
    it under the terms of the GNU General Public License as published by
@@ -16,14 +16,34 @@
 
 #include <config.h>
 
-#include <stdlib.h>
+#include <sys/socket.h>
+
+#include "signature.h"
+SIGNATURE_CHECK (listen, int, (int, int));
+
+#include <errno.h>
+#include <unistd.h>
+
+#include "sockets.h"
+#include "macros.h"
 
 int
-main ()
+main (void)
 {
-  /* Check that malloc (0) is not a NULL pointer.  */
-  if (malloc (0) == NULL)
-    return 1;
+  (void) gl_sockets_startup (SOCKETS_1_1);
+
+  /* Test behaviour for invalid file descriptors.  */
+  {
+    errno = 0;
+    ASSERT (listen (-1, 1) == -1);
+    ASSERT (errno == EBADF);
+  }
+  {
+    close (99);
+    errno = 0;
+    ASSERT (listen (99 ,1) == -1);
+    ASSERT (errno == EBADF);
+  }
 
   return 0;
 }

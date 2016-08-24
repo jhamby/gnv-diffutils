@@ -1,5 +1,5 @@
 /* Test of quotearg family of functions.
-   Copyright (C) 2008-2013 Free Software Foundation, Inc.
+   Copyright (C) 2008-2016 Free Software Foundation, Inc.
 
    This program is free software; you can redistribute it and/or modify
    it under the terms of the GNU General Public License as published by
@@ -29,6 +29,7 @@
 #include "localcharset.h"
 #include "progname.h"
 #include "macros.h"
+#include "zerosize-ptr.h"
 
 #include "test-quotearg.h"
 
@@ -56,6 +57,28 @@ static struct result_groups results_g[] = {
       "'a\\b'", "'" LQ RQ "'", "'" LQ RQ "'" },
     { "''", "'1'", 3, "'simple'", "' \t\n'\\''\"\033?""?/\\'", "'a:b'",
       "'a\\b'", "'" LQ RQ "'", "'" LQ RQ "'" } },
+
+  /* shell_escape_quoting_style */
+  { { "''", "''$'\\0''1'$'\\0'", 15, "simple",
+      "' '$'\\t\\n'\\''\"'$'\\033''?""?/\\'", "a:b",
+      "'a\\b'", "''$'" LQ_ENC RQ_ENC "'", LQ RQ },
+    { "''", "''$'\\0''1'$'\\0'", 15, "simple",
+      "' '$'\\t\\n'\\''\"'$'\\033''?""?/\\'", "a:b",
+      "'a\\b'", "''$'" LQ_ENC RQ_ENC "'", LQ RQ },
+    { "''", "''$'\\0''1'$'\\0'", 15, "simple",
+      "' '$'\\t\\n'\\''\"'$'\\033''?""?/\\'", "'a:b'",
+      "'a\\b'", "''$'" LQ_ENC RQ_ENC "'", LQ RQ } },
+
+  /* shell_escape_always_quoting_style */
+  { { "''", "''$'\\0''1'$'\\0'", 15, "'simple'",
+      "' '$'\\t\\n'\\''\"'$'\\033''?""?/\\'", "'a:b'",
+      "'a\\b'", "''$'" LQ_ENC RQ_ENC "'", "'" LQ RQ "'" },
+    { "''", "''$'\\0''1'$'\\0'", 15, "'simple'",
+      "' '$'\\t\\n'\\''\"'$'\\033''?""?/\\'", "'a:b'",
+      "'a\\b'", "''$'" LQ_ENC RQ_ENC "'", "'" LQ RQ "'" },
+    { "''", "''$'\\0''1'$'\\0'", 15, "'simple'",
+      "' '$'\\t\\n'\\''\"'$'\\033''?""?/\\'", "'a:b'",
+      "'a\\b'", "''$'" LQ_ENC RQ_ENC "'", "'" LQ RQ "'" } },
 
   /* c_quoting_style */
   { { "\"\"", "\"\\0001\\0\"", 9, "\"simple\"",
@@ -297,6 +320,40 @@ main (int argc _GL_UNUSED, char *argv[])
                        ascii_only);
     }
 
+  {
+    /* Trigger the bug whereby quotearg_buffer would read beyond the NUL
+       that defines the end of the string being quoted.  Use an input
+       string whose NUL is the last byte before an unreadable page.  */
+    char *z = zerosize_ptr ();
+
+    if (z)
+      {
+        size_t q_len = 1024;
+        char *q = malloc (q_len + 1);
+        char buf[10];
+        memset (q, 'Q', q_len);
+        q[q_len] = 0;
+
+        /* Z points to the boundary between a readable/writable page
+           and one that is neither readable nor writable.  Position
+           our string so its NUL is at the end of the writable one.  */
+        char const *str = "____";
+        size_t s_len = strlen (str);
+        z -= s_len + 1;
+        memcpy (z, str, s_len + 1);
+
+        set_custom_quoting (NULL, q, q);
+        /* Whether this actually triggers a SEGV depends on the
+           implementation of memcmp: whether it compares only byte-at-
+           a-time, and from left to right (no SEGV) or some other way.  */
+        size_t n = quotearg_buffer (buf, sizeof buf, z, SIZE_MAX, NULL);
+        ASSERT (n == s_len + 2 * q_len);
+        ASSERT (memcmp (buf, q, sizeof buf) == 0);
+        free (q);
+      }
+  }
+
   quotearg_free ();
+
   return 0;
 }

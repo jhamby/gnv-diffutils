@@ -1,6 +1,7 @@
 # Main Automakefile for GNU diffutils.
 
-# Copyright (C) 2001-2002, 2004, 2006, 2009-2013 Free Software Foundation, Inc.
+# Copyright (C) 2001-2002, 2004, 2006, 2009-2013, 2015-2016 Free Software
+# Foundation, Inc.
 
 # This program is free software: you can redistribute it and/or modify
 # it under the terms of the GNU General Public License as published by
@@ -33,11 +34,25 @@ gen_start_date = '2009-11-11 15:00'
 gen-ChangeLog:
 	$(AM_V_GEN)if test -d .git; then				\
 	  $(top_srcdir)/build-aux/gitlog-to-changelog			\
-	    --since=$(gen_start_date) > $(distdir)/cl-t;		\
-	  rm -f $(distdir)/ChangeLog;					\
-	  mv $(distdir)/cl-t $(distdir)/ChangeLog;			\
+	    --since=$(gen_start_date) > $(distdir)/cl-t &&		\
+	    { rm -f $(distdir)/ChangeLog &&				\
+	      mv $(distdir)/cl-t $(distdir)/ChangeLog; }		\
 	fi
 
 ALL_RECURSIVE_TARGETS += distcheck-hook
 distcheck-hook:
 	$(MAKE) my-distcheck
+
+# Some of our git hook scripts are supposed to be identical to git's samples.
+# See if they are still in sync.
+.PHONY: check-git-hook-script-sync
+check-git-hook-script-sync:
+	@fail=0;							\
+	t=$$(mktemp -d)							\
+	  && cd $$t && git init -q && cd .git/hooks			\
+	  && for i in pre-commit pre-applypatch applypatch-msg; do	\
+	       diff -u $(abs_top_srcdir)/scripts/git-hooks/$$i $$i.sample	\
+		 || fail=1;						\
+	     done;							\
+	rm -rf $$t;							\
+	test $$fail = 0

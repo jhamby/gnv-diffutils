@@ -1,5 +1,5 @@
 # Customize maint.mk                           -*- makefile -*-
-# Copyright (C) 2003-2013 Free Software Foundation, Inc.
+# Copyright (C) 2003-2013, 2015-2016 Free Software Foundation, Inc.
 
 # This program is free software: you can redistribute it and/or modify
 # it under the terms of the GNU General Public License as published by
@@ -13,6 +13,10 @@
 
 # You should have received a copy of the GNU General Public License
 # along with this program.  If not, see <http://www.gnu.org/licenses/>.
+
+# Use the direct link.  This is guaranteed to work immediately, while
+# it can take a while for the faster mirror links to become usable.
+url_dir_list = http://ftp.gnu.org/gnu/$(PACKAGE)
 
 # Used in maint.mk's web-manual rule
 manual_title = Comparing and Merging Files
@@ -29,7 +33,7 @@ bootstrap-tools = autoconf,automake,gnulib
 # Now that we have better tests, make this the default.
 export VERBOSE = yes
 
-old_NEWS_hash = 7d70c18e90495732e671b3c94da01651
+old_NEWS_hash = 69329628b612be7ab46517bbf067c85f
 
 # Tell maint.mk's syntax-check rules that diff gets config.h directly or
 # via diff.h or system.h.

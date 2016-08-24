@@ -1,4 +1,546 @@
+2016-08-20  Jim Meyering  <meyering@fb.com>
+
+	version 3.5
+	* NEWS: Record release date.
+
+2016-08-16  Jim Meyering  <meyering@fb.com>
+
+	build: arrange to build with -fno-common, when possible
+	* configure.ac (WERROR_CFLAGS): Add -fno-common, when possible.
+	This would have prevented the duplicate definition of
+	presume_output_tty that was fixed in v3.4-10-gc2dc91f.
+
+2016-08-16  Hanno Böck  <hanno@hboeck.de>
+
+	diff: avoid duplicate definition of presume_output_tty
+	* src/util.c (presume_output_tty): Remove this definition.
+	The other is in diff.h.  Reported in https://bugs.gnu.org/24248
+
+2016-08-14  Jim Meyering  <meyering@fb.com>
+
+	gnulib: update to latest
+
+	tests: diff3: work around missing seq on some systems
+	* tests/diff3 (seq): Provide a seq replacement function,
+	since at least AIX, SunOS 5.10, OpenBSD-5.8 lack it.
+	Reported by Assaf Gordon in https://bugs.gnu.org/24227#8
+
+2016-08-13  Jim Meyering  <meyering@fb.com>
+
+	diff3: fix leaks, for real
+	* src/diff3.c (struct diff_block)[lint]: Add member, n2.
+	(free_diff_block, next_to_n2): New functions.
+	* tests/diff3: Add more test coverage.
+
+	maint: require that commit messages be of a certain form
+	* bootstrap.conf (bootstrap_epilogue): Merge from coreutils, so that
+	a local commit hook will now help enforce consistent commit messages.
+	* Makefile.am (check-git-hook-script-sync): New rule, largely copied
+	from coreutils.
+	* scripts/git-hooks/commit-msg: New file, from coreutils, but
+	with adapted list of program names.
+	* scripts/git-hooks/applypatch-msg: New file, from git.
+	* scripts/git-hooks/pre-applypatch: Likewise.
+	* scripts/git-hooks/pre-commit: Likewise.
+
+2016-08-13  Bastian Beischer  <bastian.beischer@rwth-aachen.de>
+
+	diff3: fix heap use-after-free; add minimal diff3 test coverage
+	Commit v3.3-42-g3b74a90, "FIXME: src/diff3: plug a leak" added an
+	invalid use of free, leading to use-after-free in nearly any invocation
+	of diff3.  Revert that commit.
+	* NEWS (Bug fixes): Mention it.
+	* tests/diff3: New file, to add minimal test coverage.
+	* tests/Makefile.am (TESTS): Add it.
+	Reported by Bastian Beischer in http://bugs.gnu.org/24210
+
+2016-08-13  Jim Meyering  <meyering@fb.com>
+
+	build: ignore texinfo build artifacts
+	* .gitignore: Ignore texinfo artifacts in doc/.
+
+	maint: diff3: remove an unreachable statement
+	* src/diff3.c (main): Remove unreachable "return" after exit from main.
+
+2016-08-08  Jim Meyering  <meyering@fb.com>
+
+	diff: disable colorization for TERM=dumb
+	* src/diff.c (main): With --color or --color=auto, when TERM is
+	"dumb", disable colorization.  Suggested by Daniel Colascione.
+	* NEWS (Bug fixes): Mention it.
+	* tests/colors: Add a test that would fail without this change,
+	yet passes with it.
+
+	maint: post-release administrivia
+	* NEWS: Add header line for next release.
+	* .prev-version: Record previous version.
+	* cfg.mk (old_NEWS_hash): Auto-update.
+
+	version 3.4
+	* NEWS: Record release date.
+
+2016-08-06  Jim Meyering  <meyering@fb.com>
+
+	gnulib: update to latest
+
+	tests: tweak built_programs definition
+	* tests/Makefile.am (built_programs): Adjust to work around what
+	may be a problem due to interaction between Solaris 10's /bin/sh
+	and an old version of GNU make. Reported by Dagobert Michelsen
+	in https https://bugs.gnu.org/24137.
+
+2016-08-02  Jim Meyering  <meyering@fb.com>
+
+	gnulib: update to latest
+
+	tests: skip a /proc/self-dependent test on the Hurd
+	* tests/brief-vs-stat-zero-kernel-lies: The Hurd's /proc/self
+	is not useful, so detect that and skip the test that requires it.
+	Reported by Assaf Gordon in https://debbugs.gnu.org/24121#29
+
+2016-08-01  Jim Meyering  <meyering@fb.com>
+
+	tests/colors: fix portability problem with touch --date
+	* tests/colors (epoch): Don't use GNU touch's --date=$epoch option.
+	Use the portable -t 197001010000.00.
+	Reported by Assaf Gordon in https://debbugs.gnu.org/24121#8
+
+	build: Solaris 9: avoid link failure due to isblank use
+	* bootstrap.conf (gnulib_modules): Add isblank, to avoid a link
+	error on Solaris 9 Sparc.  Reported by Dagobert Michelsen.
+
+	test: improve test infrastructure
+	* tests/envvar-check: New file, copied from grep, with the addition
+	of the EDITOR and GREP_OPTIONS envvar names.
+	* tests/Makefile.am (EXTRA_DIST): Add it.
+	(TESTS_ENVIRONMENT): Revamp, to be more like that of grep.
+
+2016-07-31  Jim Meyering  <meyering@fb.com>
+
+	maint: remove gl/lib/reg*.c.diff; no longer needed
+	* gl/lib/regcomp.c.diff: Remove file, now that gnulib's
+	regcomp.c compiles regex.c with -Wno-unused-parameter.
+	* gl/lib/regex_internal.c.diff: This file induced a change to ensure
+	that the "Idx" type was unsigned and to remove a few "VAR < 0"
+	comparisons.  These days, it is probably fine to stay in sync with
+	gnulib/glibc's copies
+	of these files, so remove these patches, too.
+	* gl/lib/regexec.c.diff: Likewise.
+	Prompted by a report by Assaf Gordon and a suggestion from Paul Eggert.
+
+	tests: colors: fix a portability problem and work around a shell bug
+	* tests/colors (e): Fix a portability bug: use printf '\033'
+	rather than '\e' to generate the required byte sequence, since
+	for some shells (at least dash 0.5.8), the latter doesn't work.
+	Work around a shell bug whereby "local tab=$(printf '\t')"
+	would result in an empty value for "$tab": hoist each "tab"
+	definition up/out of its function to global scope.
+	Reported by Assaf Gordon in http://debbugs.gnu.org/24116#8
+
+2016-07-23  Jim Meyering  <meyering@fb.com>
+
+	gnulib: update to latest; and tests/init.sh
+	* gnulib: Update to latest.
+	* init.sh: Update from gnulib.
+
+2016-05-30  Jim Meyering  <meyering@fb.com>
+
+	maint: arrange for "make distcheck" to work with unreleased automake
+	* dist-check.mk (my-distcheck): Remove all .deps directories
+	before performing the recursive comparison.
+
+2016-05-24  Glenn Morris  <rgm@gnu.org>
+
+	doc: fix a reference to emacs' emerge node
+	* doc/diffutils.texi (Interactive Merging): Correct a reference to
+	emacs' emerge node: s/emerge/Emerge/.
+	This addresses http://debbugs.gnu.org/23613
+
+2016-04-30  Jim Meyering  <meyering@fb.com>
+
+	maint: arrange for better URLs in generated announcement message
+	* cfg.mk (url_dir_list): Define.  I had been correcting the generated
+	URLs by hand, just before the announcement.  This is better.
+
+2016-03-15  Jim Meyering  <meyering@fb.com>
+
+	maint: don't ignore gitlog-to-changelog failure
+	* Makefile.am (gen-ChangeLog): Don't ignore failure of
+	gitlog-to-changelog. This syncs to coreutils' copy of this rule.
+
+2016-03-06  Giuseppe Scrivano  <gscrivano@gnu.org>
+
+	diff: --color: fix an infinite recursion bug
+	* src/diff.h (presume_output_tty): New extern variable.
+	* src/diff.c (PRESUME_OUTPUT_TTY_OPTION): New enum.
+	(group_format_option): Add '-presume-output-tty'.
+	(main): Handle PRESUME_OUTPUT_TTY_OPTION.
+	* src/util.c: New variable `presume_output_tty'.
+	(check_color_output): Handle presume_output_tty.
+	(set_color_context): Call process_signals only when color_context is
+	not RESET_CONTEXT.
+	* tests/colors: Check that diff doesn't crash when interrupted
+	in the middle of a color sequence.
+
+	Reported by Gisle Vanem in http://debbugs.gnu.org/22067
+
+2016-01-31  Jim Meyering  <meyering@fb.com>
+
+	maint: update prereq version of gettext
+	* configure.ac: Increase designated gettext version to 0.19.2
+	* bootstrap.conf (buildreq): Likewise.
+	Remove now-unnecessary code to remove gettext-provided files.
+
+	gnulib: update to latest
+
+2016-01-01  Jim Meyering  <meyering@fb.com>
+
+	FIXME: src/diff3: plug a leak
+
+2016-01-01  Jim Meyering  <meyering@fb.com>
+
+	maint: update copyright year, bootstrap, init.sh
+	Run "make update-copyright" and then...
+
+	* gnulib: Update to latest.
+	* tests/init.sh: Update from gnulib.
+	* bootstrap: Likewise.
+
+2015-12-06  Jim Meyering  <meyering@fb.com>
+
+	diff --brief no longer mistakenly reports diff. with 0-sized /proc/ files
+	Normally, it is safe to assume two regular files are different when
+	their st_size values are different.  However, that assumption may
+	be invalid if either value is zero, as happens with files on Linux
+	/proc and /sys file systems. Since skipping this optimization will
+	usually cost very little (one read syscall, to read zero bytes),
+	it is fine to accommodate those unusual files.
+	* src/analyze.c (diff_2_files): Do not assume regular files differ
+	just because their st_size values differ when one or more is 0.
+	* src/diff.c (compare_files): Likewise.
+	* tests/brief-vs-proc-stat-zero: New test.
+	* tests/Makefile.am: Add it.
+	* NEWS (Bug fixes): Describe it.
+	Reported by Stephan Müller in http://debbugs.gnu.org/21942
+
+	tests: arrange to print any skipped-test explanation to tty, too
+	I noticed that when a test was skipped, the reason was not printed.
+	This fixes it.  In coreutils, this variable is set in init.cfg,
+	but there is no point in putting the definition so far from the
+	code that chooses the file descriptor number in tests/Makefile.am.
+	* tests/Makefile.am (TESTS_ENVIRONMENT) [stderr_fileno_]: Define
+	here (to 9), right next to the companion "9>&2".
+
+2015-11-29  Jim Meyering  <meyering@fb.com>
+
+	build: add gperf to the list of required programs
+	* bootstrap.conf (buildreq): Add gperf to the list.
+	Reported by Stephan Müller in http://debbugs.gnu.org/21945
+
+2015-11-29  Giuseppe Scrivano  <gscrivano@gnu.org>
+
+	tests: Add tests for --color and --palette
+	* tests/colors: New file.
+	* tests/Makefile.am (TESTS): Add colors.
+
+	doc: mention --color and --palette in NEWS
+
+	diff: add --palette
+	* bootstrap (gnulib_modules): Add 'argmatch'.
+	* doc/diffutils.texi: Add documentation for --palette
+	* src/diff.h (set_color_palette): New prototype.
+	* src/diff.c (set_color_palette): New function.
+	(color_palette): New variable.
+	* src/utils.c: Include "argmatch.h".
+	(struct bin_str): New struct.
+	(struct color_ext_type): New struct.
+	(color_indicator): New array.
+	(indicator_name): New array.
+	(indicator_no): New enum.
+	(parse_state): New enum.
+	(put_indicator): New function.
+	(get_funky_string): New function. Copied from coreutils ls.
+	(parse_diff_color):  New function. Copied from coreutils ls
+	"parse_ls_color" function.
+	(set_color_context): Use put_indicator instead of directly
+	outputting the sequence.
+	* po/POTFILES.in: Add 'lib/argmatch.c'
+
+	diff: add support for --color
+	* doc/diffutils.texi (diff Options): Add documentation for --color.
+	Copied from coreutils ls --color.
+	* src/context.c (pr_unidiff_hunk): Set the color context.
+	(print_context_header): Likewise.
+	(pr_context_hunk): Likewise.
+	* src/diff.h (enum colors_style): New enum to record when to use colors.
+	(colors_style): New variable to memorize the argument value.
+	(set_color_context): Add function definition.
+	* src/diff.c: : Define COLOR_OPTION.
+	(specify_colors_style): New function.
+	(longopts): Add --color.
+	(main): Handle --color argument.
+	(option_help_msgid): Add usage string for --color.
+	* src/normal.c (print_normal_hunk): Set the color context.
+	* src/side.c (print_1sdiff_line): Likewise.
+	* src/util.c (print_1_line_nl): New function.
+	(print_1_line): Make it a wrapper of 'print_1_line_nl'.
+	(colors_enabled): New boolean variable.
+	(begin_output): Call check_color_output once the output file is
+	configured.
+	(output_1_line): Periodically call `process_signals'.
+	(caught_signals): New sigset_t.
+	(colors_enabled): New boolean variable.
+	(interrupt_signal): New sig_atomic_t.
+	(stop_signal_count): New sig_atomic_t.
+	(check_color_output): New function.
+	(install_signal_handlers): Likewise. Copied from coreutils ls.
+	(process_signals): Likewise.  Copied from coreutils ls.
+	(set_color_context): New function.
+	(sighandler): Likewise.  Copied from coreutils ls.
+	(stophandler): Likewise.  Copied from coreutils ls.
+
+2015-09-24  Andreas Grünbacher  <agruen@gnu.org>
+
+	diff: Improve help text of option --label
+	* src/diff.c (option_help_msgid): Improve help text of option --label.
+
+2015-09-01  Jim Meyering  <meyering@fb.com>
+
+	build: correct man-page generation rule
+	The PATH was set incorrectly, so that the diff used by
+	help2man was the one from $PATH, rather than the just-built
+	one.
+	* man/Makefile.am (bin_dir): New variable, to...
+	(dist_man1_MANS): ...prepend ../src to PATH, not just "..".
+	Also, add a test to ensure that each $(bin_dir)/$$base is
+	executable, so this doesn't happen again.
+	In http://debbugs.gnu.org/21023, Rodrigo Valiña
+	Gutiérrez reported that diff.1 from the diffutils-3.3 tarball
+	contained no description of the then-new --no-dereference option.
+
+2015-07-10  Jim Meyering  <meyering@fb.com>
+
+	doc: --no-dereference: improve wording/description
+	* doc/diffutils.texi (Comparing Directories): Correct grammar.
+	(diff Options) [--no-dereference]: Say a little more.
+
+2015-01-01  Jim Meyering  <meyering@fb.com>
+
+	maint: update copyright year ranges to include 2015; update gnulib
+
+2014-12-12  KO Myung-Hun  <komh@chollian.net>
+
+	diff: skip test if seek is not possible on OS/2 kLIBC
+	This fixes the problem that 'diff - file' and 'cat file | diff - file'
+	fail due to a seek failure with a message 'diff.exe: -: Invalid seek',
+	because seek does not work on stdin and a pipe on OS/2 kLIBC.
+
+	* src/io.c (sip): Set skip_test to true if seek is not possible on
+	OS/2 kLIBC.
+
+2014-12-09  Jim Meyering  <meyering@fb.com>
+
+	gnulib: update to latest
+
+2014-12-09  KO Myung-Hun  <komh78@gmail.com>
+
+	build: double-quote use of $PATH
+	* man/Makefile.am (dist_man1_MANS): On OS/2, PATH_SEPARATOR is ';',
+	but unquoted, that is interpreted as the shell's statement
+	terminator.  Quote it.
+
+2014-10-27  Paul Eggert  <eggert@cs.ucla.edu>
+
+	diff: fix integer overflow problem with --tabsize
+	Reported by Tobias Stoeckmann in: http://bugs.gnu.org/18857
+	* src/diff.c (main): Don't overflow if INTMAX_MAX / 2 < tabsize.
+	* tests/bignum: New file, to test for this bug.
+	* tests/Makefile.am (TESTS): Add it.
+
+2014-09-03  Paul Eggert  <eggert@cs.ucla.edu>
+
+	doc: mention diff -B fix in NEWS
+
+	diff: fix bug with diff -B and incomplete lines
+	Reported by Navin Kabra via Eric Blake in:
+	http://bugs.gnu.org/18402
+	* src/util.c (analyze_hunk): Don't mishandle incomplete
+	lines at end of file.
+	* tests/no-newline-at-eof: Test for the bug.
+
+	diff: fix performance bug with prefix computation
+	* src/io.c (find_identical_ends): Fix performance bug:
+	the test for when the prefix was needed messed up by
+	the 2002-02-28 integer-overflow fixes, causing performance to be
+	worse than it needed to be.
+
+2014-08-23  Jim Meyering  <meyering@fb.com>
+
+	gnulib: update to latest, as well as bootstrap
+
+	maint: update copyright year range in texinfo documentation
+	* doc/diffutils.texi: Update copyright.
+
+2014-04-15  Jim Meyering  <meyering@fb.com>
+
+	maint: update bug-reporting address
+	* README: Change bug-gnu-utils@... to bug-diffutils@gnu.org.
+	* doc/diffutils.texi: Likewise.
+	Reported by Jamie Landeg Jones.
+
+2014-03-26  Paul Eggert  <eggert@penguin.cs.ucla.edu>
+
+	diff: fix two "..." typos in --help output
+	* src/diff.c (option_help_msgid): Remove two "..." typos (Bug#17102).
+
+2014-03-25  Paul Eggert  <eggert@cs.ucla.edu>
+
+	doc: improve documentation about reading and stdin
+	See Bug#17075.
+	* doc/diffutils.texi (Comparison): Say that files need not be read.
+	(Invoking diff): Remove confusing remark about 'diff - -'.
+	It's not that useful, and it's not portable anyway.
+
+2014-02-24  Paul Eggert  <eggert@cs.ucla.edu>
+
+	diff, sdiff: minor integer overflow fixes
+	* src/context.c (find_hunk):
+	Simplify, now that 2 * context + 1 cannot overflow.
+	* src/diff.c (main):
+	* src/sdiff.c (interact):
+	Don't rely on undefined behavior on signed integer overflow.
+	* src/diff.c (main): Don't let contexts exceed CONTEXT_MAX.
+	* src/system.h (CONTEXT_MAX): New macro.
+
+	diff: fix bug with -I and overlapping hunks
+	Problem reported by Vincent Lefevre in <http://bugs.gnu.org/16864>.
+	* src/context.c (find_hunk): Threshold is CONTEXT only if
+	the second change is ignorable.
+	* tests/ignore-matching-lines: New test.
+	* tests/Makefile.am (TESTS): Add it.
+
+2014-02-23  Paul Eggert  <eggert@cs.ucla.edu>
+
+	diff: remove TOO_EXPENSIVE heuristic
+	Problem reported by Vincent Lefevre in <http://bugs.gnu.org/16848>.
+	The simplest solution is to remove the TOO_EXPENSIVE heuristic
+	that I added to GNU diff in 1993.  Although appropriate for
+	circa-1993 hardware, these days the heuristic seems to be more
+	trouble than it's worth.
+	* NEWS: Document this.
+	* doc/diffutils.texi (Overview): Modernize citations.
+	Remove mention of TOO_EXPENSIVE heuristic.
+	* src/analyze.c (diff_2_files): Adjust to TOO_EXPENSIVE-related
+	API changes in gnulib's diffseq module.
+
+	build: update gnulib submodule to latest
+
+2014-01-31  Paul Eggert  <eggert@cs.ucla.edu>
+
+	diff: exit with status 1, not 2, when binary files differ
+	Problem reported by Vincent Lefevre in <http://bugs.gnu.org/16608>.
+	* NEWS:
+	* doc/diffutils.texi (Binary, Invoking diff): Document this.
+	* src/analyze.c (briefly_report): Return void, not int.
+	All uses changed.  Do not futz with exit status.  Simplify.
+	* tests/binary: Adjust to match new behavior.
+
+2013-09-26  Paul Eggert  <eggert@cs.ucla.edu>
+
+	build: omit -Wsuggest-attribute=pure for lib
+	* configure.ac (WARN_CFLAGS): Omit -Wsuggest-attribute=pure
+	when compiling the lib subdirectory.  Reported for Fedora 19
+	by Eric Blake in <http://bugs.gnu.org/15463>.
+
+2013-08-22  Paul Eggert  <eggert@cs.ucla.edu>
+
+	cmp, diff, sdiff: tune by using rawmemchr
+	On my platform (AMD Phenom II X4 910e, Fedora 17 x86-64), this sped up
+	'cmp -n 8GiB /dev/full /dev/zero' by a factor of 3.8, and
+	'cmp -sn 8GiB /dev/full /dev/zero' by a factor of 1.8.
+	* bootstrap.conf (gnulib_modules): Add rawmemchr.
+	* src/cmp.c (cmp): Optimize the common case where buffers are the same,
+	by using count_newlines rather than block_compare_and_count.
+	(block_compare_and_count): Remove.
+	(count_newlines): New function.
+	* src/cmp.c (count_newlines):
+	* src/io.c (prepare_text):
+	* src/sdiff.c (lf_copy, lf_skip, lf_snarf):
+	Use rawmemchr instead of memchr, for speed.
+
+2013-08-12  Paul Eggert  <eggert@cs.ucla.edu>
+
+	cmp: tune 'cmp a b' for GCC x86
+	Performance problem reported by David Balažic in:
+	http://lists.gnu.org/archive/html/bug-diffutils/2013-08/msg00013.html
+	* src/system.h (word): Make it size_t, not uintmax_t.
+	This sped up plain cmp 90% on my tests (GCC 4.8.1, x86).
+
+2013-07-06  Paul Eggert  <eggert@cs.ucla.edu>
+
+	build: update gnulib submodule to latest
+
+2013-05-06  Stefano Lattarini  <stefano.lattarini@gmail.com>
+
+	build: enable 'subdir-objects' automake option
+	The future major Automake version (2.0, ETA at least one year from now)
+	might enable that option unconditionally, so better get prepared in due
+	time.
+
+	* configure.ac (AM_INIT_AUTOMAKE): Adjust.
+	(AM_PROG_CC_C_O): New, required by Automake up to 1.13.x when the
+	'subdir-objects' is in use.
+
+2013-04-28  Paul Eggert  <eggert@cs.ucla.edu>
+
+	build: update gnulib submodule to latest
+
+2013-04-03  Paul Eggert  <eggert@cs.ucla.edu>
+
+	diff: fix bug with Asian file names
+	Problem reported by Errembault Philippe in:
+	http://lists.gnu.org/archive/html/bug-diffutils/2013-03/msg00012.html
+	* NEWS: Document this.
+	* src/dir.c (compare_names): Fall back on file_name_cmp if
+	compare_collated returns 0, unless ignoring file name case.
+	(diff_dirs): Don't bother with the O(N**2) stuff unless ignoring
+	file name case.
+	* tests/Makefile.am (TESTS): Add strcoll-0-names.
+	* tests/strcoll-0-names: New file.
+
+	diff: remove unnecessary decl
+	* src/dir.c (compare_names_for_qsort): Remove declaration.
+	Not needed now that we assume C89.
+
+	diff: tune compare_names_for_qsort
+	* src/dir.c (compare_collated): New function.
+	(compare_names): Use it.
+	(compare_names_for_qsort): Use it.  This is a bit more efficient
+	as it can avoid a double invocation of file_name_cmp when
+	file_name_cmp returns zero.
+
+2013-03-30  Jim Meyering  <meyering@fb.com>
+
+	doc: mention new option, --no-dereference in 3.3's NEWS
+	* NEWS (New feeatures): Update 3.3's news to mention --no-dereference.
+	Reported by Denis Excoffier.
+	* Makefile.am (old_NEWS_hash): Update, since this modifies old, and
+	normally-immutable NEWS.
+
+2013-03-26  Paul Eggert  <eggert@cs.ucla.edu>
+
+	tests: port to Solaris 10 /bin/sh
+	* tests/Makefile.am (TESTS_ENVIRONMENT):
+	Use "FOO=val; export FOO" rather than "export FOO=val",
+	as the latter form doesn't work with Solaris /bin/sh.
+	Problem found when trying to run "make check" on Solaris 10.
+
 2013-03-24  Jim Meyering  <meyering@fb.com>
+
+	maint: post-release administrivia
+	* NEWS: Add header line for next release.
+	* .prev-version: Record previous version.
+	* cfg.mk (old_NEWS_hash): Auto-update.
 
 	version 3.3
 	* NEWS: Record release date.

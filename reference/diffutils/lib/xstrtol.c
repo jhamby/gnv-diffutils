@@ -1,6 +1,6 @@
 /* A more useful interface to strtol.
 
-   Copyright (C) 1995-1996, 1998-2001, 2003-2007, 2009-2013 Free Software
+   Copyright (C) 1995-1996, 1998-2001, 2003-2007, 2009-2016 Free Software
    Foundation, Inc.
 
    This program is free software: you can redistribute it and/or modify
@@ -34,13 +34,13 @@
    need stderr defined if assertion checking is enabled.  */
 #include <stdio.h>
 
-#include <assert.h>
 #include <ctype.h>
 #include <errno.h>
 #include <limits.h>
 #include <stdlib.h>
 #include <string.h>
 
+#include "assure.h"
 #include "intprops.h"
 
 /* xstrtoll.c and xstrtoull.c, which include this file, require that
@@ -93,9 +93,11 @@ __xstrtol (const char *s, char **ptr, int strtol_base,
   __strtol_t tmp;
   strtol_error err = LONGINT_OK;
 
-  assert (0 <= strtol_base && strtol_base <= 36);
+  assure (0 <= strtol_base && strtol_base <= 36);
 
   p = (ptr ? ptr : &t_ptr);
+
+  errno = 0;
 
   if (! TYPE_SIGNED (__strtol_t))
     {
@@ -107,7 +109,6 @@ __xstrtol (const char *s, char **ptr, int strtol_base,
         return LONGINT_INVALID;
     }
 
-  errno = 0;
   tmp = __strtol (s, p, strtol_base);
 
   if (*p == s)
@@ -147,8 +148,11 @@ __xstrtol (const char *s, char **ptr, int strtol_base,
           return err | LONGINT_INVALID_SUFFIX_CHAR;
         }
 
-      if (strchr (valid_suffixes, '0'))
+      switch (**p)
         {
+        case 'E': case 'G': case 'g': case 'k': case 'K': case 'M': case 'm':
+        case 'P': case 'T': case 't': case 'Y': case 'Z':
+
           /* The "valid suffix" '0' is a special flag meaning that
              an optional second suffix is allowed, which can change
              the base.  A suffix "B" (e.g. "100MB") stands for a power
@@ -156,19 +160,20 @@ __xstrtol (const char *s, char **ptr, int strtol_base,
              a power of 1024.  If no suffix (e.g. "100M"), assume
              power-of-1024.  */
 
-          switch (p[0][1])
-            {
-            case 'i':
-              if (p[0][2] == 'B')
-                suffixes += 2;
-              break;
+          if (strchr (valid_suffixes, '0'))
+            switch (p[0][1])
+              {
+              case 'i':
+                if (p[0][2] == 'B')
+                  suffixes += 2;
+                break;
 
-            case 'B':
-            case 'D': /* 'D' is obsolescent */
-              base = 1000;
-              suffixes++;
-              break;
-            }
+              case 'B':
+              case 'D': /* 'D' is obsolescent */
+                base = 1000;
+                suffixes++;
+                break;
+              }
         }
 
       switch (**p)
@@ -178,11 +183,14 @@ __xstrtol (const char *s, char **ptr, int strtol_base,
           break;
 
         case 'B':
+          /* This obsolescent first suffix is distinct from the 'B'
+             second suffix above.  E.g., 'tar -L 1000B' means change
+             the tape after writing 1000 KiB of data.  */
           overflow = bkm_scale (&tmp, 1024);
           break;
 
         case 'c':
-          overflow = 0;
+          overflow = LONGINT_OK;
           break;
 
         case 'E': /* exa or exbi */

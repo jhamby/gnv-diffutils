@@ -1,8 +1,61 @@
 GNU diffutils NEWS                                    -*- outline -*-
 
+* Noteworthy changes in release 3.5 (2016-08-20) [stable]
+
+** Bug fixes
+
+  diff3 no longer malfunctions due to use-after-free
+  [bug introduced in 3.4]
+
+  diff --color no longer colorizes when TERM=dumb
+
+
+* Noteworthy changes in release 3.4 (2016-08-08) [stable]
+
+** New features
+
+   diff accepts two new options --color and --palette to generate
+   and configure colored output.  --color takes an optional argument
+   specifying when to colorize a line: --color=always, --color=auto,
+   --color=never.  --palette is used to configure which colors are used.
+
+** Bug fixes
+
+  When binary files differ, diff now exits with status 1 as POSIX requires.
+  Formerly it exited with status 2.
+
+  Unless the --ignore-file-name-case option is used, diff now
+  considers file names to be equal only if they are byte-for-byte
+  equivalent.  This fixes a bug where diff in an English locale might
+  consider two Asian file names to be the same merely because they
+  contain no English characters.
+
+  diff -B no longer generates incorrect output if the two inputs
+  each end with a one-byte incomplete line.
+
+  diff --brief no longer reports a difference for unusual identical files.
+  For example, when comparing a file like /proc/cmdline (for which the linux
+  kernel reports st_size of 0 even though it is not an empty file) to a
+  copy of that file's contents residing on a "normal" file system:
+    $ f=/proc/cmdline; cp $f k; diff --brief $f k
+    Files /proc/cmdline and k differ
+
+** Performance changes
+
+  diff's default algorithm has been adjusted to output higher-quality
+  results at somewhat greater computational cost, as CPUs have gotten
+  faster since the algorithm was last tweaked in diffutils-2.6 (1993).
+
+
 * Noteworthy changes in release 3.3 (2013-03-24) [stable]
 
 ** New features
+
+  diff accepts a new option, --no-dereference.  With this option, symbolic
+  links are treated specially: as a separate type of file that can compare
+  equal only to another symbolic link with the same value.  For example,
+  with --no-dereference, two symbolic links compare equal when they have
+  the same value, even when that value does not reference a readable file.
 
   --new-file (-N) and --unidirectional-new-file now allow comparisons to "-".
   A standard input that's closed acts like a nonexistent file.
@@ -324,8 +377,8 @@ User-visible changes in version 2.0:
 
 
 
-Copyright (C) 1993-1994, 1998, 2001-2002, 2004, 2006, 2009-2013 Free Software
-Foundation, Inc.
+Copyright (C) 1993-1994, 1998, 2001-2002, 2004, 2006, 2009-2013, 2015-2016 Free
+Software Foundation, Inc.
 
 This file is part of GNU Diffutils.
 

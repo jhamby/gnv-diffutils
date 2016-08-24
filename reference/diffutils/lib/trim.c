@@ -1,5 +1,5 @@
 /* Removes leading and/or trailing whitespaces
-   Copyright (C) 2006-2013 Free Software Foundation, Inc.
+   Copyright (C) 2006-2016 Free Software Foundation, Inc.
 
    This program is free software: you can redistribute it and/or modify
    it under the terms of the GNU General Public License as published by
@@ -31,7 +31,7 @@
 #include "xalloc.h"
 
 /* Use this to suppress gcc's "...may be used before initialized" warnings. */
-#ifdef lint
+#if defined GCC_LINT || defined lint
 # define IF_LINT(Code) Code
 #else
 # define IF_LINT(Code) /* empty */

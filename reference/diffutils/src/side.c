@@ -1,7 +1,7 @@
 /* sdiff-format output routines for GNU DIFF.
 
-   Copyright (C) 1991-1993, 1998, 2001-2002, 2004, 2009-2013 Free Software
-   Foundation, Inc.
+   Copyright (C) 1991-1993, 1998, 2001-2002, 2004, 2009-2013, 2015-2016 Free
+   Software Foundation, Inc.
 
    This file is part of GNU DIFF.
 
@@ -206,6 +206,18 @@ print_1sdiff_line (char const *const *left, char sep,
   size_t c2o = sdiff_column2_offset;
   size_t col = 0;
   bool put_newline = false;
+  bool color_to_reset = false;
+
+  if (sep == '<')
+    {
+      set_color_context (DELETE_CONTEXT);
+      color_to_reset = true;
+    }
+  else if (sep == '>')
+    {
+      set_color_context (ADD_CONTEXT);
+      color_to_reset = true;
+    }
 
   if (left)
     {
@@ -233,6 +245,9 @@ print_1sdiff_line (char const *const *left, char sep,
 
   if (put_newline)
     putc ('\n', out);
+
+  if (color_to_reset)
+    set_color_context (RESET_CONTEXT);
 }
 
 /* Print lines common to both files in side-by-side format.  */

@@ -1,5 +1,5 @@
-/* Test of usleep() function.
-   Copyright (C) 2009-2013 Free Software Foundation, Inc.
+/* Test setsockopt() function.
+   Copyright (C) 2011-2016 Free Software Foundation, Inc.
 
    This program is free software: you can redistribute it and/or modify
    it under the terms of the GNU General Public License as published by
@@ -14,27 +14,42 @@
    You should have received a copy of the GNU General Public License
    along with this program.  If not, see <http://www.gnu.org/licenses/>.  */
 
-/* Written by Eric Blake <ebb9@byu.net>, 2009.  */
-
 #include <config.h>
 
-#include <unistd.h>
+#include <sys/socket.h>
 
 #include "signature.h"
-SIGNATURE_CHECK (usleep, int, (useconds_t));
+SIGNATURE_CHECK (setsockopt, int, (int, int, int, const void *, socklen_t));
 
-#include <time.h>
+#include <errno.h>
+#include <unistd.h>
 
+#include "sockets.h"
 #include "macros.h"
 
 int
 main (void)
 {
-  time_t start = time (NULL);
-  ASSERT (usleep (1000000) == 0);
-  ASSERT (start < time (NULL));
+  (void) gl_sockets_startup (SOCKETS_1_1);
 
-  ASSERT (usleep (0) == 0);
+  /* Test behaviour for invalid file descriptors.  */
+  {
+    int value = 1;
+
+    errno = 0;
+    ASSERT (setsockopt (-1, SOL_SOCKET, SO_REUSEADDR, &value, sizeof (value))
+            == -1);
+    ASSERT (errno == EBADF);
+  }
+  {
+    int value = 1;
+
+    close (99);
+    errno = 0;
+    ASSERT (setsockopt (99, SOL_SOCKET, SO_REUSEADDR, &value, sizeof (value))
+            == -1);
+    ASSERT (errno == EBADF);
+  }
 
   return 0;
 }

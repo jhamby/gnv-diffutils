@@ -1,7 +1,7 @@
 /* diff3 - compare three files line by line
 
-   Copyright (C) 1988-1989, 1992-1996, 1998, 2001-2002, 2004, 2006, 2009-2013
-   Free Software Foundation, Inc.
+   Copyright (C) 1988-1989, 1992-1996, 1998, 2001-2002, 2004, 2006, 2009-2013,
+   2015-2016 Free Software Foundation, Inc.
 
    This program is free software: you can redistribute it and/or modify
    it under the terms of the GNU General Public License as published by
@@ -78,6 +78,9 @@ struct diff_block {
   char **lines[2];		/* The actual lines (may contain nulls) */
   size_t *lengths[2];		/* Line lengths (including newlines, if any) */
   struct diff_block *next;
+#ifdef lint
+  struct diff_block *n2;	/* Used only when freeing.  */
+#endif
 };
 
 /* Three way diff */
@@ -176,7 +179,7 @@ static struct diff3_block *create_diff3_block (lin, lin, lin, lin, lin, lin);
 static struct diff3_block *make_3way_diff (struct diff_block *, struct diff_block *);
 static struct diff3_block *reverse_diff3_blocklist (struct diff3_block *);
 static struct diff3_block *using_to_diff3_block (struct diff_block *[2], struct diff_block *[2], int, int, struct diff3_block const *);
-static struct diff_block *process_diff (char const *, char const *, struct diff_block **);
+static struct diff_block *process_diff (char const *, char const *, struct diff_block **, char **);
 static void check_stdout (void);
 static void fatal (char const *) __attribute__((noreturn));
 static void output_diff3 (FILE *, struct diff3_block *, int const[3], int const[3]);
@@ -211,6 +214,38 @@ static struct option const longopts[] =
   {"version", 0, 0, 'v'},
   {0, 0, 0, 0}
 };
+
+static void
+free_diff_block (struct diff_block *p)
+{
+#ifndef lint
+  (void)p;
+#else
+  while (p)
+    {
+      free (p->lines[0]);
+      free (p->lines[1]);
+      free (p->lengths[0]);
+      free (p->lengths[1]);
+      struct diff_block *next = p->n2;
+      free (p);
+      p = next;
+    }
+#endif
+}
+
+/* Copy each next pointer to n2, since make_3way_diff would clobber the former,
+   yet we will still need something to free these buffers.  */
+static void
+next_to_n2 (struct diff_block *p)
+{
+#ifndef lint
+  (void)p;
+#else
+  while (p)
+    p = p->n2 = p->next;
+#endif
+}
 
 int
 main (int argc, char **argv)
@@ -377,10 +412,19 @@ main (int argc, char **argv)
   /* Invoke diff twice on two pairs of input files, combine the two
      diffs, and output them.  */
 
+  char *b0, *b1;
   commonname = file[rev_mapping[FILEC]];
-  thread1 = process_diff (file[rev_mapping[FILE1]], commonname, &last_block);
-  thread0 = process_diff (file[rev_mapping[FILE0]], commonname, &last_block);
+  thread1 = process_diff (file[rev_mapping[FILE1]], commonname, &last_block, &b1);
+  thread0 = process_diff (file[rev_mapping[FILE0]], commonname, &last_block, &b0);
+
+  next_to_n2 (thread0);
+  next_to_n2 (thread1);
+
   diff3 = make_3way_diff (thread0, thread1);
+
+  free_diff_block (thread0);
+  free_diff_block (thread1);
+
   if (edscript)
     conflicts_found
       = output_diff3_edscript (stdout, diff3, mapping, rev_mapping,
@@ -400,9 +444,10 @@ main (int argc, char **argv)
       conflicts_found = false;
     }
 
+  free (b0);
+  free (b1);
   check_stdout ();
   exit (conflicts_found);
-  return conflicts_found;
 }
 
 static void
@@ -939,7 +984,8 @@ compare_line_list (char * const list1[], size_t const lengths1[],
 static struct diff_block *
 process_diff (char const *filea,
 	      char const *fileb,
-	      struct diff_block **last_block)
+	      struct diff_block **last_block,
+	      char **buf_to_free)
 {
   char *diff_contents;
   char *diff_limit;
@@ -954,6 +1000,7 @@ process_diff (char const *filea,
 				  sizeof *bptr->lengths[1]));
 
   diff_limit = read_diff (filea, fileb, &diff_contents);
+  *buf_to_free = diff_contents;
   scan_diff = diff_contents;
 
   while (scan_diff < diff_limit)
