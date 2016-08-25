@@ -30,19 +30,20 @@ $test_loop:
 $   read/end=test_loop_end t_in line_in
 $   line_in = f$edit(line_in, "trim")
 $   key = f$extract(0, 6, line_in)
-$   if key .eqs. "PASS: "
+$   if (key .eqs. "PASS: ") .or. (key .eqs. "XFAIL:")
 $   then
 $	test = f$element(1, ":", line_in)
 $	test = f$edit(test, "trim")
 $	gosub junit_report_pass
 $   else
-$	if key .eqs. "FAIL: "
+$	if (key .eqs. "FAIL: ") .or. (key .eqs. "ERROR:") .or. -
+           (key .eqs. "XPASS:")
 $	then
 $	    test = f$element(1, ":", line_in)
 $	    test = f$edit(test, "trim")
 $	    gosub junit_report_fail
 $	else
-$	    if key .eqs. "SKIP "
+$	    if key .eqs. "SKIP: "
 $	    then
 $		test = f$element(1, ":", line_in)
 $		test = f$edit(test, "trim")

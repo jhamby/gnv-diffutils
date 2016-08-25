@@ -64,12 +64,8 @@ $   then
 $	test_name = "no-dereference"
 $	create 'base_disk'[.tests]'test_name'.
 $	open/append test_fix 'base_disk'[.tests]'test_name'.
-$	write test_fix "printf "":test-result: SKIP\n"" > ''test_name'.trs"
-$	write test_fix -
-            "printf "":global-test-result: SKIP\n"" >> ''test_name'.trs"
-$	write test_fix "printf "":recheck: yes\n"" >> ''test_name'.trs"
-$	write test_fix "printf "":copy-in-global-log: yes\n"" >> ''test_name'.trs"
-$	write test_fix "exit 1"
+$	write test_fix "printf ""no-dereference: skipped test: need coreutils 8.25+\n"""
+$	write test_fix "exit 77"
 $	close test_fix
 $	purge 'base_disk'[.tests]'test_name'.
 $  endif
@@ -86,13 +82,8 @@ $!   then
 $	test_name = "help-version"
 $	create 'base_disk'[.tests]'test_name'.
 $	open/append test_fix 'base_disk'[.tests]'test_name'.
-$	write test_fix "printf "":test-result: SKIP\n"" > ''test_name'.trs"
-$	write test_fix -
-	  "printf "":global-test-result: SKIP\n"" >> ''test_name'.trs"
-$	write test_fix "printf "":recheck: yes\n"" >> ''test_name'.trs"
-$	write test_fix -
-	  "printf "":copy-in-global-log: yes\n"" >> ''test_name'.trs"
-$	write test_fix "exit 1"
+$	write test_fix "printf ""help version: skipped test: no /dev/full\n"""
+$	write test_fix "exit 77"
 $	close test_fix
 $	purge 'base_disk'[.tests]'test_name'.
 $!   endif
