@@ -286,7 +286,7 @@ bash readme file below.
 Acknowledgements:
 
 This port was done by John Malmberg using information from the Bash 4.2.45
-and later GNV ports, and also information from the ports by Stephen
+and later GNV ports, and also information from the ports by Steven
 M Schewda.
 
 There may be bugs in the GNV ports of diffutils for OpenVMS that were not

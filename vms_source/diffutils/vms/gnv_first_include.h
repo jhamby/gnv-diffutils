@@ -15,14 +15,14 @@
 #define LLONG_MAX __INT64_MAX
 #define LLONG_MIN __INT64_MIN
 
-/* Issue identified by Stephen M Schweda port */
+/* Issue identified by Steven M Schweda port */
 #include "vms_fake_path/stdio.h"
 /* Bug in VMS stdio.h uses a VMS path for P_tmpdir */
 #ifdef P_tmpdir
 #undef P_tmpdir
 #endif
 
-/* Issue identified by Stephen M Schweda port */
+/* Issue identified by Steven M Schweda port */
 #include "vms_fake_path/fcntl.h"
 #define O_BINARY O_NOCTTY
 static int vms_open(const char *file_spec, int flags, mode_t mode) {
@@ -45,7 +45,7 @@ static int vms_open(const char *file_spec, int flags, mode_t mode) {
 static int _fileno(FILE *fileptr) { return fileno(fileptr); }
 
 
-/* Issue identified by Stephen M Schweda port */
+/* Issue identified by Steven M Schweda port */
 #undef unlink
 static int vms_unlink_all(const char * path) {
     int status;
@@ -66,7 +66,7 @@ static int vms_unlink_all(const char * path) {
 }
 #define unlink vms_unlink_all
 
-/* Issue identified by Stephen M Schweda port */
+/* Issue identified by Steven M Schweda port */
 
 static size_t vms_fwrite(const void *ptr, size_t size, size_t num, FILE *fp) {
     if (size == 1) {
@@ -82,7 +82,7 @@ static size_t vms_fwrite(const void *ptr, size_t size, size_t num, FILE *fp) {
 }
 #define fwrite vms_fwrite
 
-/* Issue identified by Stephen M Schewda port */
+/* Issue identified by Steven M Schewda port */
 FILE * vms_popen(const char *command, const char *mode);
 int vms_pclose(FILE * stream);
 int vms_system(const char *string);
@@ -93,7 +93,7 @@ int vms_execvp (const char *file_name, char * argv[]);
 #define system vms_system
 #define execvp vms_execvp
 
-/* Issue identified by Stephen M Schweda port */
+/* Issue identified by Steven M Schweda port */
 #ifndef __VAX
 #ifdef GDIFF_MAIN
 #define initialize_main(argcp, argvp) vms_set_case_ignore(argcp argvp)
