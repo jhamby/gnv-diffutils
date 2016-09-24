@@ -1,6 +1,6 @@
 From file: diffutils_release_note_start.com
 
-This is a port of Diffutils 3.3 with input from the many VMS OpenSource
+This is a port of Diffutils 3.5 with input from the many VMS OpenSource
 developers.  Much of this is from lessons learned from the Bash 4.2.45 port.
 
 Note: I am a hobbyist and am not providing any support or any commitment
@@ -9,8 +9,8 @@ warrantees.
 
 The testing of this port of Diffutils involved some spot testing of the
 various utilities, particularly the rm and mv utilities which had visible
-bugs in GNV.  At this time, A VAX build has not been attempted and would
-need some work.
+bugs in GNV.  At this time, A VAX build has not been attempted of this
+port.
 
 Special installation notes:
 
@@ -110,7 +110,7 @@ DECC$FILE_PERMISSION_UNIX enabled.
 DECC$FILE_SHARING enabled.
 DECC$FILE_OWNER_UNIX enabled.
 DECC$FILENAME_UNIX_NO_VERSION enabled.
-DECC$FILENAME_UNIX_ONLY enabled.
+DECC$FILENAME_UNIX_ONLY enabled if running under GNV Bash.
 DECC$GLOB_UNIX_STYLE enabled.
 DECC$POSIX_SEEK_STREAM_FILE enabled.
 DECC$READDIR_DROPDOTNOTYPE enabled.
@@ -139,9 +139,42 @@ Workarounds have been implemented for the cases that have been observed in
 for running configure scripts.  These are not complete work arounds, so there
 still may be corner cases that fail.
 
-This kit is designed to be used with the GNV Bash 4.2.45 or later kit.
+This kit is designed to be used with the GNV Bash 4.2.45 or later kit, and
+can also be used from DCL.
 
-Known issues with the Diffutils 3.3 kit.
+Known issues with the Diffutils 3.5 kit.
+
+*   Diffutils uses the PATH environment variable in Unix syntax to find
+    images for the child programs to run, even when run from DCL.
+    Use the DCL symbol PATH = "/usr/bin:/bin" for GNV.
+    It is planned for a future release to define the PATH symbol if it is
+    not already defined in the image.
+
+*   When one of the diffutils programs: diff3, sdiff, launches a program
+    to assist with diff, that program is launched with execve(), so must
+    be an image.
+
+*   When one of the diffutils programs launches an editor, that editor
+    program will be launched with a system() call.  If "SHELL"
+    environment variable does not exist, then a DCL editor command can
+    be used.  The default editor command is "ed" which will usually
+    cause the DCL EDIT command to be used.  If the DCL program exits
+    with a status of 0 or 1 it will be interpreted as a success status.
+    If the "SHELL" environment variable exists, then the editor program
+    must be one that GNV bash can launch.
+
+*   If "SHELL" environment variable does not exist, the Diffutils utilities
+    will expect a DCL environment and look for foreign commands if the
+    program is not found in the PATH environment variable.   The program
+    used should be able to handle quoted filename parameters, which most
+    "native" DCL utilities can not handle.
+
+*   The sdiff commands to launch an editor are not expected to work when
+    run under GNV Bash until some shell programs to launch an editor are
+    either written or provided by another program.  When bash directly
+    launches a program, the standard I/O is set to VMS mailboxes and none
+    of the native VMS screen editors will run that way.
+    A future GNV kit may provide a program to launch the VMS editors.
 
 *   The filename-quoting test fails because it tries to create filenames
     of "Control-A" and "Control-I", which the CRTL does not currently allow.
@@ -207,13 +240,20 @@ Known issues with the Diffutils 3.3 kit.
 
     $ export gl_cv_func_working_mkstemp=yes
 
-Fixes and enhancements in the Diffutils 3.3 kit.
+Fixes and enhancements in the Diffutils 3.5 kit.
+
+*   The diff --[no-]ignore-file-name-case default setting matches
+    the current SET PROCESS/CASE_LOOKUP setting.
+
+*   Unlink of temporary editor files will unlink all versions of the file.
 
 *   This kit should be able to be installed on VMS Software Inc. releases of
     OpenVMS.
 
-*   No logical names required for proper Diffutils operations other than GNV$GNU
-    for locating the simulated "/".
+*   No logical names required for proper Diffutils operations other than
+    GNV$GNU for locating the simulated "/".
+    When running under DCL, the PATH symbol should be set to
+    "/usr/bin:/bin" at a minimum.
 
     The older GNV programs may still need the logical names until they get
     the same fixes.  Those additional logical names should be set in
@@ -246,7 +286,8 @@ bash readme file below.
 Acknowledgements:
 
 This port was done by John Malmberg using information from the Bash 4.2.45
-and later GNV ports.
+and later GNV ports, and also information from the ports by Stephen
+M Schewda.
 
 There may be bugs in the GNV ports of diffutils for OpenVMS that were not
 officially recorded but have now been fixed as a result of resolving the

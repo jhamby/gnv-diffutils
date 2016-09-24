@@ -1,2 +1,8 @@
 sys$disk:[-]gnv_vms_iconv_wrapper.o
+sys$disk:[-]vms_popen_hack.o
+sys$disk:[-]vms_execvp_hack.o
+sys$disk:[-]vms_get_foreign_cmd.o
+sys$disk:[-]vms_terminal_io.o
+sys$disk:[-]vms_vm_pipe.o
+sys$disk:[-]vms_fname_to_unix.o
 sys$disk:[-]vms_crtl_init_unix.obj

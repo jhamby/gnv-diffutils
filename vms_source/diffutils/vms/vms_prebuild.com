@@ -33,9 +33,9 @@ $ endif
 $!
 $! CRTL pre-init
 $!----------------
-$ if f$search("vms_crtl_init_unix.obj") .eqs. ""
+$ if f$search("vms_crtl_init.obj") .eqs. ""
 $ then
-$   cc/define=GNV_UNIX_TOOL=1/object=sys$disk:[]vms_crtl_init_unix.obj -
+$   cc/object=sys$disk:[]vms_crtl_init_unix.obj -
         [.vms]vms_crtl_init.c
 $ endif
 $!

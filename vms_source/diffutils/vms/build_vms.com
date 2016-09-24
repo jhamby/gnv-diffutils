@@ -12,7 +12,7 @@ $ start_time = f$cvtime()
 $!
 $! Pre setup, including coping all files into the beginning of a search list.
 $!
-$ @[.vms]vms_prebuild.com
+$ @[.vms]vms_prebuild.com "''p1'"
 $!
 $! Save the old default
 $!
@@ -31,8 +31,28 @@ $ file = "sys$disk:[]conftest.lis"
 $ if f$search(file) .nes. "" then delete 'file';*
 $ file = "sys$disk:[]conftest.dsf"
 $ if f$search(file) .nes. "" then delete 'file';*
+$ file = "sys$disk:[.conf*]*.*"
+$ if f$search(file) .nes. "" then delete 'file';*
+$set ver
+$ file = "sys$disk:[]conf*.dir"
+$ if f$search(file) .nes. "" then delete 'file';*
+$ if f$search(file) .nes. ""
+$ then
+$    dir 'file'
+$    delete 'file';*
+$    dir 'file'
+$ endif
+$set nover
 $!
 $ bash vms/vms_make.sh
+$!
+$ file = "sys$disk:[]conf*.dir"
+$ if f$search(file) .nes. ""
+$ then
+$    dir 'file'
+$    delete 'file';*
+$    dir 'file'
+$ endif
 $!
 $! Restore the old default
 $!

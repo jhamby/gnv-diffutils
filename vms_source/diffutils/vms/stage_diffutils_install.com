@@ -115,7 +115,11 @@ $       dest3 = "new_gnu:[bin]''myfile'.exe"
 $       if mode .eqs. "install"
 $       then
 $           if f$search(dest1) .eqs. "" then copy 'source' 'dest1'
+$	    if f$search(dest2) .eqs. "" then set file/enter='dest2' 'dest1'
+$	    if f$search(dest3) .eqs. "" then set file/enter='dest3' 'dest1'
 $       else
+$           if f$search(dest3) .nes. "" then set file/remove 'dest3';*
+$           if f$search(dest2) .nes. "" then set file/remove 'dest2';*
 $           if f$search(dest1) .nes. "" then delete 'dest1';*
 $       endif
 $       goto inst_file_loop

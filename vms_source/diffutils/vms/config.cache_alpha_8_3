@@ -83,6 +83,7 @@ ac_cv_func_rawmemchr=${ac_cv_func_rawmemchr=no}
 ac_cv_func_readlink=${ac_cv_func_readlink=yes}
 ac_cv_func_readlinkat=${ac_cv_func_readlinkat=no}
 ac_cv_func_secure_getenv=${ac_cv_func_secure_getenv=no}
+ac_cv_func_setdtablesize=${ac_cv_func_setdtablesize=no}
 ac_cv_func_setenv=${ac_cv_func_setenv=yes}
 ac_cv_func_setrlimit=${ac_cv_func_setrlimit=no}
 ac_cv_func_shutdown=${ac_cv_func_shutdown=yes}
@@ -110,13 +111,11 @@ ac_cv_func_towlower=${ac_cv_func_towlower=yes}
 ac_cv_func_tsearch=${ac_cv_func_tsearch=no}
 ac_cv_func_tzset=${ac_cv_func_tzset=yes}
 ac_cv_func_unsetenv=${ac_cv_func_unsetenv=yes}
-ac_cv_func_usleep=${ac_cv_func_usleep=yes}
 ac_cv_func_vasnprintf=${ac_cv_func_vasnprintf=no}
 ac_cv_func_vasprintf=${ac_cv_func_vasprintf=no}
 ac_cv_func_vfork=${ac_cv_func_vfork=no}
 ac_cv_func_vfork_works=${ac_cv_func_vfork_works=no}
 ac_cv_func_wcrtomb=${ac_cv_func_wcrtomb=yes}
-ac_cv_func_wcscoll=${ac_cv_func_wcscoll=yes}
 ac_cv_func_wcslen=${ac_cv_func_wcslen=yes}
 ac_cv_func_wcsnlen=${ac_cv_func_wcsnlen=no}
 ac_cv_func_wctob=${ac_cv_func_wctob=yes}
@@ -284,17 +283,14 @@ ac_cv_header_inttypes_h=${ac_cv_header_inttypes_h=yes}
 ac_cv_header_langinfo_h=${ac_cv_header_langinfo_h=yes}
 ac_cv_header_libintl_h=${ac_cv_header_libintl_h=no}
 ac_cv_header_malloc_h=${ac_cv_header_malloc_h=no}
-ac_cv_header_memory_h=${ac_cv_header_memory_h=yes}
 ac_cv_header_minix_config_h=${ac_cv_header_minix_config_h=no}
 ac_cv_header_netdb_h=${ac_cv_header_netdb_h=yes}
 ac_cv_header_netinet_in_h=${ac_cv_header_netinet_in_h=yes}
 ac_cv_header_search_h=${ac_cv_header_search_h=no}
 ac_cv_header_stat_broken=${ac_cv_header_stat_broken=no}
 ac_cv_header_stdbool_h=${ac_cv_header_stdbool_h=yes}
-ac_cv_header_stdc=${ac_cv_header_stdc=yes}
 ac_cv_header_stdint_h=${ac_cv_header_stdint_h=no}
 ac_cv_header_stdlib_h=${ac_cv_header_stdlib_h=yes}
-ac_cv_header_string_h=${ac_cv_header_string_h=yes}
 ac_cv_header_strings_h=${ac_cv_header_strings_h=yes}
 ac_cv_header_sys_bitypes_h=${ac_cv_header_sys_bitypes_h=yes}
 ac_cv_header_sys_inttypes_h=${ac_cv_header_sys_inttypes_h=yes}
@@ -333,13 +329,13 @@ ac_cv_member_struct_tm_tm_gmtoff=${ac_cv_member_struct_tm_tm_gmtoff=yes}
 ac_cv_member_struct_tm_tm_zone=${ac_cv_member_struct_tm_tm_zone=yes}
 ac_cv_objext=${ac_cv_objext=o}
 ac_cv_path_EGREP=${ac_cv_path_EGREP='/bin/grep -E'}
-ac_cv_path_GMSGFMT=${ac_cv_path_GMSGFMT=/usr/bin/msgfmt}
+ac_cv_path_GMSGFMT=${ac_cv_path_GMSGFMT=:}
 ac_cv_path_GREP=${ac_cv_path_GREP=/bin/grep}
-ac_cv_path_MSGFMT=${ac_cv_path_MSGFMT=/usr/bin/msgfmt}
-ac_cv_path_MSGMERGE=${ac_cv_path_MSGMERGE=/usr/bin/msgmerge}
+ac_cv_path_MSGFMT=${ac_cv_path_MSGFMT=:}
+ac_cv_path_MSGMERGE=${ac_cv_path_MSGMERGE=:}
 ac_cv_path_PR_PROGRAM=${ac_cv_path_PR_PROGRAM=/usr/bin/pr}
 ac_cv_path_SED=${ac_cv_path_SED=/bin/sed}
-ac_cv_path_XGETTEXT=${ac_cv_path_XGETTEXT=/usr/bin/xgettext}
+ac_cv_path_XGETTEXT=${ac_cv_path_XGETTEXT=:}
 ac_cv_path_install=${ac_cv_path_install='/usr/bin/install -c'}
 ac_cv_path_mkdir=${ac_cv_path_mkdir=/bin/mkdir}
 ac_cv_prog_AWK=${ac_cv_prog_AWK=gawk}
@@ -348,7 +344,6 @@ ac_cv_prog_CPP=${ac_cv_prog_CPP='cc -E'}
 ac_cv_prog_ac_ct_AR=${ac_cv_prog_ac_ct_AR=ar}
 ac_cv_prog_cc_c11=${ac_cv_prog_cc_c11=no}
 ac_cv_prog_cc_c99=${ac_cv_prog_cc_c99=}
-ac_cv_prog_cc_cc_c_o=${ac_cv_prog_cc_cc_c_o=yes}
 ac_cv_prog_cc_g=${ac_cv_prog_cc_g=yes}
 ac_cv_prog_cc_stdc=${ac_cv_prog_cc_stdc=}
 ac_cv_prog_make_make_set=${ac_cv_prog_make_make_set=yes}
@@ -381,7 +376,6 @@ ac_cv_type_struct_sockaddr_storage=${ac_cv_type_struct_sockaddr_storage=yes}
 ac_cv_type_timezone_t=${ac_cv_type_timezone_t=no}
 ac_cv_type_uid_t=${ac_cv_type_uid_t=yes}
 ac_cv_type_unsigned_long_long_int=${ac_cv_type_unsigned_long_long_int=yes}
-ac_cv_type_useconds_t=${ac_cv_type_useconds_t=yes}
 ac_cv_type_volatile_sig_atomic_t=${ac_cv_type_volatile_sig_atomic_t=yes}
 ac_cv_working_alloca_h=${ac_cv_working_alloca_h=no}
 acl_cv_hardcode_direct=${acl_cv_hardcode_direct=no}
@@ -399,20 +393,14 @@ acl_cv_wl=${acl_cv_wl=}
 am_cv_CC_dependencies_compiler_type=${am_cv_CC_dependencies_compiler_type=none}
 am_cv_ar_interface=${am_cv_ar_interface=ar}
 am_cv_func_iconv=${am_cv_func_iconv=yes}
-am_cv_func_iconv_works=${am_cv_func_iconv_works=yes}
+am_cv_func_iconv_works=${am_cv_func_iconv_works=no}
 am_cv_langinfo_codeset=${am_cv_langinfo_codeset=yes}
 am_cv_lib_iconv=${am_cv_lib_iconv=no}
 am_cv_make_support_nested_variables=${am_cv_make_support_nested_variables=yes}
 am_cv_prog_cc_c_o=${am_cv_prog_cc_c_o=yes}
-am_cv_prog_cc_cc_c_o=${am_cv_prog_cc_cc_c_o=yes}
 am_cv_proto_iconv=${am_cv_proto_iconv='extern size_t iconv (iconv_t cd, char * *inbuf, size_t *inbytesleft, char * *outbuf, size_t *outbytesleft);'}
 am_cv_proto_iconv_arg1=${am_cv_proto_iconv_arg1=}
 gl_cv_C_locale_sans_EILSEQ=${gl_cv_C_locale_sans_EILSEQ=yes}
-gl_cv_absolute_arpa_inet_h=${gl_cv_absolute_arpa_inet_h=}
-gl_cv_absolute_ctype_h=${gl_cv_absolute_ctype_h=}
-gl_cv_absolute_sys_ioctl_h=${gl_cv_absolute_sys_ioctl_h=}
-gl_cv_absolute_sys_socket_h=${gl_cv_absolute_sys_socket_h=}
-gl_cv_absolute_sys_uio_h=${gl_cv_absolute_sys_uio_h=}
 gl_cv_bitsizeof_ptrdiff_t=${gl_cv_bitsizeof_ptrdiff_t=32}
 gl_cv_bitsizeof_sig_atomic_t=${gl_cv_bitsizeof_sig_atomic_t=32}
 gl_cv_bitsizeof_size_t=${gl_cv_bitsizeof_size_t=32}
@@ -429,7 +417,7 @@ gl_cv_double_slash_root=${gl_cv_double_slash_root=yes}
 gl_cv_func___va_copy=${gl_cv_func___va_copy=no}
 gl_cv_func_btowc_eof=${gl_cv_func_btowc_eof='guessing yes'}
 gl_cv_func_btowc_nul=${gl_cv_func_btowc_nul=yes}
-gl_cv_func_dup2_works=${gl_cv_func_dup2_works=yes}
+gl_cv_func_dup2_works=${gl_cv_func_dup2_works=no}
 gl_cv_func_fcntl_f_dupfd_cloexec=${gl_cv_func_fcntl_f_dupfd_cloexec=no}
 gl_cv_func_fcntl_f_dupfd_works=${gl_cv_func_fcntl_f_dupfd_works=no}
 gl_cv_func_fdopen_works=${gl_cv_func_fdopen_works=yes}
@@ -477,7 +465,6 @@ gl_cv_func_strerror_0_works=${gl_cv_func_strerror_0_works=yes}
 gl_cv_func_svid_putenv=${gl_cv_func_svid_putenv=no}
 gl_cv_func_symlink_works=${gl_cv_func_symlink_works=no}
 gl_cv_func_unsetenv_works=${gl_cv_func_unsetenv_works=no}
-gl_cv_func_usleep_works=${gl_cv_func_usleep_works=no}
 gl_cv_func_va_copy=${gl_cv_func_va_copy=no}
 gl_cv_func_wcrtomb_retval=${gl_cv_func_wcrtomb_retval='guessing yes'}
 gl_cv_func_wctob_works=${gl_cv_func_wctob_works='guessing yes'}
@@ -713,12 +700,12 @@ gl_cv_header_sys_select_h_selfcontained=${gl_cv_header_sys_select_h_selfcontaine
 gl_cv_header_sys_socket_h_selfcontained=${gl_cv_header_sys_socket_h_selfcontained=yes}
 gl_cv_header_sys_socket_h_shut=${gl_cv_header_sys_socket_h_shut=yes}
 gl_cv_header_wchar_h_correct_inline=${gl_cv_header_wchar_h_correct_inline=yes}
-gl_cv_header_working_fcntl_h=${gl_cv_header_working_fcntl_h=yes}
+gl_cv_header_working_fcntl_h=${gl_cv_header_working_fcntl_h=no}
 gl_cv_header_working_stdalign_h=${gl_cv_header_working_stdalign_h=no}
 gl_cv_lib_sigsegv=${gl_cv_lib_sigsegv='no, consider installing GNU libsigsegv'}
 gl_cv_lib_socket=${gl_cv_lib_socket='none needed'}
-gl_cv_next_arpa_inet_h=${gl_cv_next_arpa_inet_h='""'}
-gl_cv_next_ctype_h=${gl_cv_next_ctype_h='""'}
+gl_cv_next_arpa_inet_h=${gl_cv_next_arpa_inet_h='<vms_fake_path/inet.h>'}
+gl_cv_next_ctype_h=${gl_cv_next_ctype_h='<vms_fake_path/ctype.h>'}
 gl_cv_next_errno_h=${gl_cv_next_errno_h='<vms_fake_path/errno.h>'}
 gl_cv_next_fcntl_h=${gl_cv_next_fcntl_h='<vms_fake_path/fcntl.h>'}
 gl_cv_next_float_h=${gl_cv_next_float_h='<vms_fake_path/float.h>'}
@@ -727,6 +714,7 @@ gl_cv_next_iconv_h=${gl_cv_next_iconv_h='<vms_fake_path/iconv.h>'}
 gl_cv_next_inttypes_h=${gl_cv_next_inttypes_h='<vms_fake_path/inttypes.h>'}
 gl_cv_next_langinfo_h=${gl_cv_next_langinfo_h='<vms_fake_path/langinfo.h>'}
 gl_cv_next_locale_h=${gl_cv_next_locale_h='<vms_fake_path/locale.h>'}
+gl_cv_next_netinet_in_h=${gl_cv_next_netinet_in_h='<vms_fake_path/in.h>'}
 gl_cv_next_signal_h=${gl_cv_next_signal_h='<vms_fake_path/signal.h>'}
 gl_cv_next_stdarg_h=${gl_cv_next_stdarg_h='<vms_fake_path/stdarg.h>'}
 gl_cv_next_stddef_h=${gl_cv_next_stddef_h='<vms_fake_path/stddef.h>'}
@@ -735,13 +723,13 @@ gl_cv_next_stdio_h=${gl_cv_next_stdio_h='<vms_fake_path/stdio.h>'}
 gl_cv_next_stdlib_h=${gl_cv_next_stdlib_h='<vms_fake_path/stdlib.h>'}
 gl_cv_next_string_h=${gl_cv_next_string_h='<vms_fake_path/string.h>'}
 gl_cv_next_strings_h=${gl_cv_next_strings_h='<vms_fake_path/strings.h>'}
-gl_cv_next_sys_ioctl_h=${gl_cv_next_sys_ioctl_h='""'}
-gl_cv_next_sys_select_h=${gl_cv_next_sys_select_h='<sys/select.h>'}
-gl_cv_next_sys_socket_h=${gl_cv_next_sys_socket_h='""'}
+gl_cv_next_sys_ioctl_h=${gl_cv_next_sys_ioctl_h='<vms_fake_path/ioctl.h>'}
+gl_cv_next_sys_select_h=${gl_cv_next_sys_select_h='<vms_fake_path/select.h>'}
+gl_cv_next_sys_socket_h=${gl_cv_next_sys_socket_h='<vms_fake_path/socket.h>'}
 gl_cv_next_sys_stat_h=${gl_cv_next_sys_stat_h='<vms_fake_path/stat.h>'}
 gl_cv_next_sys_time_h=${gl_cv_next_sys_time_h='<vms_fake_path/time.h>'}
 gl_cv_next_sys_types_h=${gl_cv_next_sys_types_h='<vms_fake_path/types.h>'}
-gl_cv_next_sys_uio_h=${gl_cv_next_sys_uio_h='""'}
+gl_cv_next_sys_uio_h=${gl_cv_next_sys_uio_h='<vms_fake_path/uio.h>'}
 gl_cv_next_sys_wait_h=${gl_cv_next_sys_wait_h='<vms_fake_path/wait.h>'}
 gl_cv_next_time_h=${gl_cv_next_time_h='<vms_fake_path/time.h>'}
 gl_cv_next_unistd_h=${gl_cv_next_unistd_h='<vms_fake_path/unistd.h>'}

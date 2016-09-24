@@ -1,11 +1,8 @@
-#ifndef vms_getrlimit_hack_h
-#define vms_getrlimit_hack_h
-
-/* File: vms_getrlimit_hack.h
+/* File: termios.h
  *
- * Provide a getrlimit() function
+ * Simulate this on VMS.
  *
- * Copyright 2016, John Malmberg
+ * Copyright 2012, John Malmberg
  *
  * Permission to use, copy, modify, and/or distribute this software for any
  * purpose with or without fee is hereby granted, provided that the above
@@ -19,31 +16,25 @@
  * ACTION OF CONTRACT, NEGLIGENCE OR OTHER TORTIOUS ACTION, ARISING OUT
  * OF OR IN CONNECTION WITH THE USE OR PERFORMANCE OF THIS SOFTWARE.
  *
- */
+ * 20-Mar-2012	J. Malmberg	Original
+ *
+ ***************************************************************************/
 
-#include <vms_fake_path/errno.h>
-#include <vms_fake_path/stdlib.h>
-#include <vms_fake_path/unistd.h>
+#ifndef _TERMIOS_H
+#define _TERMIOS_H 1
 
-#define RLIMIT_NOFILE (1)
-#define RLIM_INFINITY (-1)
-
-struct vms_rlimit {
-   unsigned int rlim_cur;
-   unsigned int rlim_max;
-};
-
-#define rlimit vms_rlimit
-#define getrlimit vms_getrlimit
-
-static int vms_getrlimit(int resource, struct vms_rlimit *rlp) {
-    if ((rlp != NULL) && (resource == RLIMIT_NOFILE)) {
-        rlp->rlim_cur = getdtablesize() + 1;
-        rlp->rlim_max = rlp->rlim_max;
-        return 0;
-    }
-    errno = EINVAL;
-    return (unsigned int)-1;
-}
-
+/* Supress _RLTCAP_H_ inclusion. */
+#if !defined (_RLTCAP_H_)
+#define _RLTCAP_H_ 1
 #endif
+
+/* Need VMS terminal support */
+#include "vms_term.h"
+
+/* termios.h section */
+#include "bits_termios.h"
+
+#include "vms_terminal_io.h"
+
+
+#endif /* _TERMIOS_H */
